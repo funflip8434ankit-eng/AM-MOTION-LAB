@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AM Motion Lab — Learn. Create. Earn.</title>
+<meta name="description" content="AM Motion Lab is an online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.">
+<link rel="icon" type="image/png" href="image_web/icon_logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Background connective layer: shared gradient glows that run behind every section -->
+<div class="bg-field" aria-hidden="true">
+  <div class="glow glow--one"></div>
+  <div class="glow glow--two"></div>
+  <div class="glow glow--three"></div>
+  <div class="glow glow--four"></div>
+  <div class="spine"></div>
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="#home" class="nav__logo" aria-label="AM Motion Lab home">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="nav__logo-full">
+      <img src="image_web/icon_logo.png" alt="AM Motion Lab" class="nav__logo-icon">
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#home">Home</a>
+      <a href="#learn">Learn</a>
+      <a href="#courses">Courses</a>
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <a href="#contact" class="btn btn--primary nav__cta">Start Learning</a>
+
+    <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home">Home</a>
+    <a href="#learn">Learn</a>
+    <a href="#courses">Courses</a>
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+    <a href="#contact" class="btn btn--primary">Start Learning</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="hero__inner">
+    <div class="hero__copy" data-reveal>
+      <p class="eyebrow">AM Motion Lab</p>
+      <h1 class="hero__title">Learn. Create. <span class="hero__title-accent">Earn.</span></h1>
+      <p class="hero__sub">Build real creative skills. Work on real projects. Turn your skills into opportunities.</p>
+      <p class="hero__desc">AM Motion Lab helps aspiring creators learn video editing, motion graphics, animation and graphic design through practical, industry-focused training — so software skills turn into real creative ability.</p>
+      <div class="hero__actions">
+        <a href="#courses" class="btn btn--primary">Explore Courses</a>
+        <a href="#contact" class="btn btn--ghost">Talk to Us</a>
+      </div>
+    </div>
+
+    <div class="hero__media" data-reveal>
+      <div class="media-frame media-frame--16-9">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+          <p class="media-frame__label">Showreel / Course Preview</p>
+          <p class="media-frame__hint">Add video or motion graphic here — 16:9</p>
+        </div>
+      </div>
+      <div class="hero__media-glass" aria-hidden="true"></div>
+    </div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true"><span></span></div>
+</section>
+
+<!-- ================= BRAND STATEMENT ================= -->
+<section class="statement">
+  <div class="statement__inner" data-reveal>
+    <h2 class="statement__lead">Creative skills are not just about learning software. <br>They are about learning how to create.</h2>
+    <p class="statement__body">AM Motion Lab focuses on practical learning, creative thinking and project-based experience — so students can move beyond tutorials and start creating work they can actually show.</p>
+  </div>
+</section>
+
+<!-- ================= WHAT YOU'LL LEARN ================= -->
+<section class="learn" id="learn">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">What You'll Learn</p>
+    <h2>Four creative disciplines. One practical path.</h2>
+  </div>
+
+  <div class="learn__grid" data-reveal>
+
+    <button class="learn-card" data-panel="video-editing">
+      <span class="learn-card__num">01</span>
+      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="13" height="13" rx="2"/><path d="M15.5 9.5l6-3.2v11.4l-6-3.2"/></svg>
+      <h3>Video Editing</h3>
+      <p>Professional editing, storytelling, pacing, transitions, sound design and social-media-ready content.</p>
+      <span class="learn-card__more">View details</span>
+    </button>
+
+    <button class="learn-card" data-panel="motion-graphics">
+      <span class="learn-card__num">02</span>
+      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 8 8"/><path d="M4 12l3-3M4 12l3 3"/></svg>
+      <h3>Motion Graphics</h3>
+      <p>Animation principles, typography animation, visual effects, compositing and motion design.</p>
+      <span class="learn-card__more">View details</span>
+    </button>
+
+    <button class="learn-card" data-panel="animation">
+      <span class="learn-card__num">03</span>
+      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg>
+      <h3>2D &amp; 3D Animation</h3>
+      <p>Animation fundamentals, 3D workflows, modelling and animation concepts, creative visual production.</p>
+      <span class="learn-card__more">View details</span>
+    </button>
+
+    <button class="learn-card" data-panel="graphic-design">
+      <span class="learn-card__num">04</span>
+      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
+      <h3>Graphic Design</h3>
+      <p>Visual composition, branding, layouts, social creatives and core design fundamentals.</p>
+      <span class="learn-card__more">View details</span>
+    </button>
+
+  </div>
+</section>
+
+<!-- ================= COURSES ================= -->
+<section class="courses" id="courses">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Courses</p>
+    <h2>Structured, practical, project-based.</h2>
+    <p class="section-head__sub">Details below are editable placeholders — final duration, format and certification information will be added by AM Motion Lab.</p>
+  </div>
+
+  <div class="courses__grid" data-reveal>
+
+    <article class="course-card">
+      <div class="media-frame media-frame--16-9 course-card__media">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+          <p class="media-frame__label">Course Image</p>
+          <p class="media-frame__hint">16:9</p>
+        </div>
+      </div>
+      <div class="course-card__body">
+        <h3>Video Editing</h3>
+        <p>From fundamentals to professional editing workflows.</p>
+        <ul class="course-card__skills">
+          <li>Cutting &amp; pacing</li>
+          <li>Sound design</li>
+          <li>Colour basics</li>
+        </ul>
+        <div class="course-card__actions">
+          <button class="btn btn--text" data-course="video-editing">View Details</button>
+          <a href="#contact" class="btn btn--primary btn--sm">Enquire Now</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="course-card">
+      <div class="media-frame media-frame--16-9 course-card__media">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+          <p class="media-frame__label">Course Image</p>
+          <p class="media-frame__hint">16:9</p>
+        </div>
+      </div>
+      <div class="course-card__body">
+        <h3>Motion Graphics</h3>
+        <p>Create animated visuals that communicate ideas.</p>
+        <ul class="course-card__skills">
+          <li>Keyframe animation</li>
+          <li>Typography motion</li>
+          <li>Compositing</li>
+        </ul>
+        <div class="course-card__actions">
+          <button class="btn btn--text" data-course="motion-graphics">View Details</button>
+          <a href="#contact" class="btn btn--primary btn--sm">Enquire Now</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="course-card">
+      <div class="media-frame media-frame--16-9 course-card__media">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+          <p class="media-frame__label">Course Image</p>
+          <p class="media-frame__hint">16:9</p>
+        </div>
+      </div>
+      <div class="course-card__body">
+        <h3>2D &amp; 3D Animation</h3>
+        <p>Learn animation workflows and build creative projects.</p>
+        <ul class="course-card__skills">
+          <li>Animation principles</li>
+          <li>3D basics</li>
+          <li>Rendering concepts</li>
+        </ul>
+        <div class="course-card__actions">
+          <button class="btn btn--text" data-course="animation">View Details</button>
+          <a href="#contact" class="btn btn--primary btn--sm">Enquire Now</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="course-card">
+      <div class="media-frame media-frame--16-9 course-card__media">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+          <p class="media-frame__label">Course Image</p>
+          <p class="media-frame__hint">16:9</p>
+        </div>
+      </div>
+      <div class="course-card__body">
+        <h3>Graphic Design</h3>
+        <p>Build strong visual design and creative communication skills.</p>
+        <ul class="course-card__skills">
+          <li>Composition</li>
+          <li>Branding basics</li>
+          <li>Social creatives</li>
+        </ul>
+        <div class="course-card__actions">
+          <button class="btn btn--text" data-course="graphic-design">View Details</button>
+          <a href="#contact" class="btn btn--primary btn--sm">Enquire Now</a>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= PROJECTS / SHOWCASE ================= -->
+<section class="projects" id="projects">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Learn Through Projects</p>
+    <h2>Practical projects turn learning into ability.</h2>
+    <p class="section-head__sub">Working on real briefs is how creative skills are actually applied. Project visuals below will be added as student and studio work becomes available.</p>
+  </div>
+
+  <div class="masonry" data-reveal>
+
+    <button class="masonry__item masonry__item--16-9" data-project="edit-reel">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+        <p class="media-frame__label">Editing Project</p>
+        <p class="media-frame__hint">16:9</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--1-1" data-project="brand-identity">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
+        <p class="media-frame__label">Design Project</p>
+        <p class="media-frame__hint">1:1</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--4-5" data-project="motion-title">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 8 8"/><path d="M4 12l3-3M4 12l3 3"/></svg>
+        <p class="media-frame__label">Motion Project</p>
+        <p class="media-frame__hint">4:5</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--1-1" data-project="character-render">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/></svg>
+        <p class="media-frame__label">Animation Project</p>
+        <p class="media-frame__hint">1:1</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--16-9" data-project="social-campaign">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
+        <p class="media-frame__label">Design Project</p>
+        <p class="media-frame__hint">16:9</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--4-5" data-project="sound-edit">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+        <p class="media-frame__label">Editing Project</p>
+        <p class="media-frame__hint">4:5</p>
+      </div>
+    </button>
+
+  </div>
+</section>
+
+<!-- ================= WHY AM MOTION LAB ================= -->
+<section class="why">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Why AM Motion Lab</p>
+    <h2>Built around practical creative growth.</h2>
+  </div>
+
+  <div class="why__grid" data-reveal>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="13" rx="2"/><path d="M8 21h8M12 17.5V21"/></svg>
+      <h3>Live Online Classes</h3>
+      <p>Learn in real time, ask questions and follow along at your own pace.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/></svg>
+      <h3>Real Projects</h3>
+      <p>Practice on practical creative briefs, not just isolated tutorials.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>
+      <h3>Mentorship</h3>
+      <p>Get feedback and direction as you build your creative skillset.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12l7-8 4 4-7 8-4-4z"/><path d="M13 8l4-4 4 4-4 4"/><path d="M6 15l3 3"/></svg>
+      <h3>Freelancing Guidance</h3>
+      <p>Understand how creative skills translate into freelance opportunities.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19V5a1 1 0 0 1 1-1h11l4 4v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+      <h3>Practical Learning</h3>
+      <p>Focused on doing the work, not just watching it get done.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg>
+      <h3>Industry-Focused Skills</h3>
+      <p>Tools and workflows aligned with how creative work is actually made.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="process">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">How It Works</p>
+    <h2>One path, six steps.</h2>
+  </div>
+
+  <div class="process__track" data-reveal>
+    <div class="process__line" aria-hidden="true"><div class="process__line-fill"></div></div>
+
+    <div class="process__step">
+      <span class="process__num">01</span>
+      <h3>Learn</h3>
+      <p>Understand the fundamentals.</p>
+    </div>
+    <div class="process__step">
+      <span class="process__num">02</span>
+      <h3>Practice</h3>
+      <p>Apply the concepts through exercises.</p>
+    </div>
+    <div class="process__step">
+      <span class="process__num">03</span>
+      <h3>Build</h3>
+      <p>Create real creative projects.</p>
+    </div>
+    <div class="process__step">
+      <span class="process__num">04</span>
+      <h3>Improve</h3>
+      <p>Get feedback and refine your work.</p>
+    </div>
+    <div class="process__step">
+      <span class="process__num">05</span>
+      <h3>Showcase</h3>
+      <p>Build work that can become part of your portfolio.</p>
+    </div>
+    <div class="process__step">
+      <span class="process__num">06</span>
+      <h3>Grow</h3>
+      <p>Use your skills for freelance or professional opportunities.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="about" id="about">
+  <div class="about__inner">
+    <div class="about__copy" data-reveal>
+      <p class="eyebrow">About AM Motion Lab</p>
+      <h2>A practical creative learning platform.</h2>
+      <p>AM Motion Lab is an online creative learning platform focused on practical skills in video editing, motion graphics, animation and graphic design.</p>
+      <p>The platform is designed around practical learning, project-based practice, creative thinking, portfolio building, consistent improvement and professional workflows — so students move from following instructions to making creative decisions on their own.</p>
+    </div>
+    <div class="about__media" data-reveal>
+      <div class="media-frame media-frame--1-1">
+        <div class="media-frame__inner">
+          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>
+          <p class="media-frame__label">Brand / Studio Image</p>
+          <p class="media-frame__hint">1:1</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CREATIVE LAB ================= -->
+<section class="lab">
+  <div class="lab__inner" data-reveal>
+    <p class="eyebrow">Creative Lab</p>
+    <h2 class="lab__heading">Where Learning Meets Creativity.</h2>
+    <div class="lab__marquee" aria-hidden="true">
+      <div class="lab__marquee-track">
+        <span>LEARN</span><span>CREATE</span><span>EDIT</span><span>ANIMATE</span><span>DESIGN</span><span>BUILD</span><span>GROW</span>
+        <span>LEARN</span><span>CREATE</span><span>EDIT</span><span>ANIMATE</span><span>DESIGN</span><span>BUILD</span><span>GROW</span>
+      </div>
+    </div>
+    <div class="lab__cards">
+      <div class="lab-card lab-card--a"></div>
+      <div class="lab-card lab-card--b"></div>
+      <div class="lab-card lab-card--c"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STUDENT JOURNEY ================= -->
+<section class="journey">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">The Journey</p>
+    <h2>From curiosity to opportunity.</h2>
+  </div>
+
+  <div class="journey__list" data-reveal>
+    <div class="journey__item"><span class="journey__dot"></span><span>Curiosity</span></div>
+    <div class="journey__item"><span class="journey__dot"></span><span>Learning</span></div>
+    <div class="journey__item"><span class="journey__dot"></span><span>Practice</span></div>
+    <div class="journey__item"><span class="journey__dot"></span><span>Projects</span></div>
+    <div class="journey__item"><span class="journey__dot"></span><span>Portfolio</span></div>
+    <div class="journey__item"><span class="journey__dot"></span><span>Opportunities</span></div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="faq" id="faq">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">FAQ</p>
+    <h2>Good questions, honest answers.</h2>
+  </div>
+
+  <div class="accordion" data-reveal>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>What does AM Motion Lab teach?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Video editing, motion graphics, 2D &amp; 3D animation and graphic design — taught through structured, practical, project-based learning.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>Who can join?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Beginners, students, freelancers and content creators who want to build real, usable creative skills.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>Do I need previous experience?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>No. Courses are structured to take beginners through fundamentals before moving into applied, project-based work.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>What software will I learn?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Industry-relevant creative software for your chosen area — specific tools are confirmed at enrolment based on the course.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>Will I work on practical projects?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Yes. Practical, project-based work is core to how every course is taught, not an optional add-on.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>Can I learn online?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Yes, classes are conducted online through live sessions.</p>
+      </div>
+    </div>
+
+    <div class="accordion__item">
+      <button class="accordion__trigger" aria-expanded="false">
+        <span>How can I enquire about classes?</span>
+        <span class="accordion__icon"></span>
+      </button>
+      <div class="accordion__panel">
+        <p>Use the enquiry form below, or reach out directly by email, phone, Instagram or YouTube.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= CONTACT / ENQUIRY ================= -->
+<section class="contact" id="contact">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Contact</p>
+    <h2>Tell us what you want to create.</h2>
+    <p class="section-head__sub">Send an enquiry and we'll get back to you — or reach out directly using the details below.</p>
+  </div>
+
+  <div class="contact__inner" data-reveal>
+
+    <div class="contact__details">
+      <a class="contact__link" href="mailto:funflip8434ankit@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 7 9-7"/></svg>
+        <span>funflip8434ankit@gmail.com</span>
+      </a>
+      <a class="contact__link" href="tel:+918434959801">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2C9.5 21 3 14.5 3 6a2 2 0 0 1 1-2z"/></svg>
+        <span>8434959801</span>
+      </a>
+      <a class="contact__link" href="tel:+918873181698">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2C9.5 21 3 14.5 3 6a2 2 0 0 1 1-2z"/></svg>
+        <span>8873181698</span>
+      </a>
+      <a class="contact__link" href="https://instagram.com/am_motion_77" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+        <span>Instagram — am_motion_77</span>
+      </a>
+      <a class="contact__link" href="https://youtube.com/@ammotion18" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M10.5 9.5l5 2.5-5 2.5v-5z" fill="currentColor" stroke="none"/></svg>
+        <span>YouTube — @ammotion18</span>
+      </a>
+    </div>
+
+    <form class="enquiry" id="enquiryForm" novalidate>
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required autocomplete="name">
+          <span class="field__error" data-error-for="fullName"></span>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+          <span class="field__error" data-error-for="email"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel">
+          <span class="field__error" data-error-for="phone"></span>
+        </div>
+        <div class="field">
+          <label for="interest">Interested In</label>
+          <select id="interest" name="interest" required>
+            <option value="" disabled selected>Select an area</option>
+            <option>Video Editing</option>
+            <option>Motion Graphics</option>
+            <option>2D Animation</option>
+            <option>3D Animation</option>
+            <option>Graphic Design</option>
+            <option>Other</option>
+          </select>
+          <span class="field__error" data-error-for="interest"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="experience">Experience Level</label>
+          <select id="experience" name="experience" required>
+            <option value="" disabled selected>Select your level</option>
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+          <span class="field__error" data-error-for="experience"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        <span class="field__error" data-error-for="message"></span>
+      </div>
+
+      <div class="field">
+        <label>Upload your work / reference</label>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a file: PDF, JPG, PNG or MP4, up to 20 megabytes">
+          <input type="file" id="fileInput" name="file" accept=".pdf,.jpg,.jpeg,.png,.mp4" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <p><strong>Upload your work / reference</strong></p>
+          <p class="dropzone__hint">PDF, JPG, PNG or MP4 — click or drag a file here, up to 20MB</p>
+        </div>
+        <div class="dropzone__file" id="fileChosen" hidden>
+          <span id="fileName"></span>
+          <button type="button" id="fileRemove" aria-label="Remove selected file">&times;</button>
+        </div>
+        <span class="field__error" data-error-for="file"></span>
+      </div>
+
+      <button type="submit" class="btn btn--primary enquiry__submit">
+        <span>Submit Enquiry</span>
+      </button>
+
+      <div class="enquiry__status" id="enquiryStatus" role="status" aria-live="polite"></div>
+    </form>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ================= MODAL (shared: learning areas, courses, projects) ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal__content" id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="footer__logo">
+      <p class="footer__tagline">Learn &bull; Create &bull; Earn</p>
+      <p class="footer__desc">An online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Navigate</h4>
+      <a href="#home">Home</a>
+      <a href="#learn">Learn</a>
+      <a href="#courses">Courses</a>
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#faq">FAQ</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Learning Areas</h4>
+      <span>Video Editing</span>
+      <span>Motion Graphics</span>
+      <span>2D &amp; 3D Animation</span>
+      <span>Graphic Design</span>
+    </div>
+
+    <div class="footer__col">
+      <h4>Contact</h4>
+      <a href="mailto:funflip8434ankit@gmail.com">funflip8434ankit@gmail.com</a>
+      <a href="tel:+918434959801">8434959801</a>
+      <a href="tel:+918873181698">8873181698</a>
+      <a href="https://instagram.com/am_motion_77" target="_blank" rel="noopener">Instagram — am_motion_77</a>
+      <a href="https://youtube.com/@ammotion18" target="_blank" rel="noopener">YouTube — @ammotion18</a>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <p>&copy; <span id="year"></span> AM Motion Lab. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</body>
+</html>
