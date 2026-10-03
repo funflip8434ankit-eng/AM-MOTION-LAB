@@ -784,7 +784,7 @@
      The secret lives in backend/.env (see backend/README.md).
      --------------------------------------------------------- */
   const PAYMENT_CONFIG = {
-    keyId: "rzp_test_TjALWCF8uhQS7x",            // <-- public Key ID (rzp_test_... / rzp_live_...)
+    keyId: "rzp_test_TjNiQPSBosqNNi",            // <-- public Key ID (rzp_test_... / rzp_live_...)
     checkoutEndpoint: "/api/create-order",    // backend: creates the Razorpay order
     verifyEndpoint: "/api/verify-payment",    // backend: verifies the payment signature
     businessName: "AM Motion Lab",
