@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create account — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body>
+<main class="auth">
+  <div class="auth__card">
+    <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+    <h1>Create your account</h1>
+    <p class="sub">Learn • Create • Earn</p>
+    <form id="f" novalidate>
+      <div class="field"><label for="name">Full name</label><input id="name" name="name" type="text" autocomplete="name" required></div>
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="phone">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="10-digit mobile number" required></div>
+      <div class="row">
+        <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required></div>
+        <div class="field"><label for="confirm">Confirm password</label><input id="confirm" name="confirm" type="password" autocomplete="new-password" required></div>
+      </div>
+      <button class="btn" id="btn" type="submit">Create account</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+    <p class="alt">Already have an account? <a id="alt" href="login.html">Log in</a></p>
+  </div>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(function () {
+  var form = document.getElementById("f"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
+  document.getElementById("alt").href = "login.html" + location.search;
+  var next = new URLSearchParams(location.search).get("next");
+  var dest = next === "courses" ? "../index.html#courses" : "dashboard.html";
+  function fail(t) { msg.className = "msg err"; msg.textContent = t; btn.disabled = false; }
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (form.password.value.length < 8) return fail("Password must be at least 8 characters.");
+    if (form.password.value !== form.confirm.value) return fail("Passwords do not match.");
+    msg.className = "msg"; msg.textContent = "Creating your account… (the first time can take up to a minute)"; btn.disabled = true;
+    try {
+      var d = await AMML.api("/api/auth/register", { method: "POST", body: {
+        name: form.name.value, email: form.email.value, phone: form.phone.value,
+        password: form.password.value, confirmPassword: form.confirm.value
+      }});
+      AMML.setToken(d.token);
+      location.href = dest;
+    } catch (err) { fail(err.message); }
+  });
+})();
+</script>
+</body>
+</html>

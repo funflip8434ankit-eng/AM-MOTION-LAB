@@ -783,10 +783,15 @@
      SECRET key here. Only the public Key ID goes in this file.
      The secret lives in backend/.env (see backend/README.md).
      --------------------------------------------------------- */
+       const IS_LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const API_BASE = IS_LOCAL ? "http://localhost:3000" : "https://am-motion-lab.onrender.com";
+  function getStudentToken() {
+    try { return localStorage.getItem("amml_token") || ""; } catch (e) { return ""; }
+  }
   const PAYMENT_CONFIG = {
-    keyId: "rzp_test_TjNiQPSBosqNNi",            // <-- public Key ID (rzp_test_... / rzp_live_...)
-    checkoutEndpoint: "/api/create-order",    // backend: creates the Razorpay order
-    verifyEndpoint: "/api/verify-payment",    // backend: verifies the payment signature
+    keyId: "rzp_test_TjNiQPSBosqNNi",                    // <-- public Key ID (rzp_test_... / rzp_live_...)
+    checkoutEndpoint: API_BASE + "/api/create-order",    // backend: creates the Razorpay order
+    verifyEndpoint: API_BASE + "/api/verify-payment",    // backend: verifies the payment signature
     businessName: "AM Motion Lab",
     themeColor: "#2563EB",
     currency: "INR",
@@ -1254,6 +1259,7 @@
 
   function openCheckout(courseId, levelId, trigger) {
     if (!overlay || !COURSES[courseId]) return;
+    if (!getStudentToken()) { location.href = "student/login.html?next=courses"; return; }
     state.course = courseId;
     state.level = LEVEL_ORDER.indexOf(levelId) > -1 ? levelId : "basic";
     state.trigger = trigger || null;
@@ -1338,7 +1344,7 @@
   function postJson(url, body) {
     return fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: Object.assign({ "Content-Type": "application/json" }, getStudentToken() ? { Authorization: "Bearer " + getStudentToken() } : {}),
       body: JSON.stringify(body),
     }).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) {
@@ -1444,7 +1450,7 @@
         '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
         '<button type="button" class="btn btn--ghost" id="coDone">Close</button>';
     const done = byId("coDone");
-    if (done) done.addEventListener("click", closeCheckout);
+    if (done) done.addEventListener("click", function () { if (success) { location.href = "student/dashboard.html"; } else { closeCheckout(); } });
     if (done) done.focus();
   }
 })();

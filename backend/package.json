@@ -4,10 +4,16 @@
   "private": true,
   "description": "Server-side Razorpay order creation and payment verification for AM Motion Lab",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.7.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
     "razorpay": "^2.9.4"
   }
 }

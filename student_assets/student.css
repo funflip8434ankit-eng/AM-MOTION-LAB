@@ -1,0 +1,50 @@
+:root{
+  --navy:#0F172A; --navy-deep:#090E1A; --blue:#2563EB; --violet:#6D28D9; --sky:#60A5FA;
+  --off-white:#F8FAFC; --ink:#E7ECF5; --ink-dim:#A7B2C6;
+  --glass:rgba(248,250,252,.06); --glass-border:rgba(148,173,214,.2);
+  --danger:#F87171; --ok:#34D399;
+}
+*{box-sizing:border-box;margin:0}
+body{
+  font-family:'Poppins',system-ui,sans-serif; color:var(--ink); min-height:100vh; min-height:100dvh;
+  background:
+    radial-gradient(900px 500px at 10% -10%,rgba(37,99,235,.28),transparent 60%),
+    radial-gradient(800px 500px at 100% 0,rgba(109,40,217,.25),transparent 60%),
+    var(--navy-deep);
+}
+.auth{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px}
+.auth__card{
+  width:100%;max-width:440px;padding:32px 28px;border-radius:24px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 30px 80px rgba(0,0,0,.45);
+}
+.auth__brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;text-decoration:none;color:var(--off-white);font-weight:700}
+.auth__brand img{width:36px;height:36px;border-radius:10px}
+h1{font-size:1.6rem;color:var(--off-white);margin-bottom:6px}
+.sub{color:var(--ink-dim);font-size:.92rem;margin-bottom:22px}
+.field{margin-bottom:14px}
+label{display:block;font-size:.8rem;font-weight:600;color:var(--ink-dim);margin-bottom:6px}
+input{
+  width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--glass-border);
+  background:rgba(9,14,26,.6);color:var(--off-white);font:inherit;font-size:.95rem;
+}
+input:focus{outline:2px solid var(--sky);outline-offset:1px}
+.btn{
+  width:100%;margin-top:6px;padding:13px;border:0;border-radius:999px;cursor:pointer;
+  font:inherit;font-weight:600;color:#fff;background:linear-gradient(90deg,var(--blue),var(--violet));
+}
+.btn:disabled{opacity:.6;cursor:wait}
+.msg{min-height:1.2em;margin-top:12px;font-size:.88rem;color:var(--ink-dim)}
+.msg.err{color:var(--danger)}
+.msg.ok{color:var(--ok)}
+.alt{margin-top:18px;font-size:.88rem;color:var(--ink-dim);text-align:center}
+.alt a{color:var(--sky)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.course-item{
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:14px 16px;margin-bottom:10px;border-radius:14px;border:1px solid var(--glass-border);
+  background:rgba(248,250,252,.04);
+}
+.course-item .tag{color:var(--sky);font-size:.85rem;font-weight:600}
+@media(max-width:480px){.row{grid-template-columns:1fr}.auth__card{padding:26px 20px}}

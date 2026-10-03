@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body>
+<main class="auth">
+  <div class="auth__card" style="max-width:640px">
+    <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+    <h1 id="hello">Loading…</h1>
+    <p class="sub" id="sub">Please wait…</p>
+    <div id="courses"></div>
+    <button class="btn" id="logout" type="button" style="margin-top:20px">Log out</button>
+  </div>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(async function () {
+  if (!AMML.getToken()) { location.replace("login.html"); return; }
+  var hello = document.getElementById("hello"), sub = document.getElementById("sub"), box = document.getElementById("courses");
+  document.getElementById("logout").addEventListener("click", function () { AMML.clearToken(); location.replace("login.html"); });
+  try {
+    var d = await AMML.api("/api/auth/me");
+    hello.textContent = "Welcome, " + d.user.name;
+    if (!d.enrollments.length) {
+      sub.textContent = "You have not enrolled in a course yet.";
+      var a = document.createElement("a"); a.href = "../index.html#courses"; a.textContent = "Browse courses"; a.style.color = "#60A5FA";
+      box.appendChild(a);
+    } else {
+      sub.textContent = "Your courses";
+      d.enrollments.forEach(function (c) {
+        var row = document.createElement("div"); row.className = "course-item";
+        var n = document.createElement("strong"); n.textContent = AMML.courseName(c.courseId);
+        var t = document.createElement("span"); t.className = "tag"; t.textContent = AMML.levelName(c.levelId);
+        row.appendChild(n); row.appendChild(t); box.appendChild(row);
+      });
+    }
+  } catch (e) {
+    if (e.status === 401) { AMML.clearToken(); location.replace("login.html"); }
+    else { hello.textContent = "Something went wrong"; sub.textContent = e.message; }
+  }
+})();
+</script>
+</body>
+</html>

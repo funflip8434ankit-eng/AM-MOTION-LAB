@@ -33,6 +33,7 @@ const PRICES = {
 
 const app = express();
 /* ---------- CORS: only our own websites may call this backend ---------- */
+app.set("trust proxy", 1);
 const ALLOWED_ORIGINS = [
   "https://funflip8434ankit-eng.github.io", // live website (GitHub Pages)
   "http://127.0.0.1:5500",                  // VS Code Live Server (testing)
@@ -45,14 +46,15 @@ app.use((req, res, next) => {
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   }
   if (req.method === "OPTIONS") return res.sendStatus(204); // browser's "permission check"
   next();
 });
 app.use(express.json({ limit: "10kb" }));
-
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api", require("./routes/payment")(razorpay, KEY_SECRET, PRICES));
 /* ---------- 1. Create order ---------- */
 app.post("/api/create-order", async (req, res) => {
   try {

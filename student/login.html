@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body>
+<main class="auth">
+  <div class="auth__card">
+    <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+    <h1>Welcome back</h1>
+    <p class="sub">Log in to continue learning.</p>
+    <form id="f" novalidate>
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn" id="btn" type="submit">Log in</button>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+    <p class="alt">New here? <a id="alt" href="register.html">Create an account</a></p>
+  </div>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(function () {
+  var form = document.getElementById("f"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
+  document.getElementById("alt").href = "register.html" + location.search;
+  var next = new URLSearchParams(location.search).get("next");
+  var dest = next === "courses" ? "../index.html#courses" : "dashboard.html";
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    msg.className = "msg"; msg.textContent = "Logging in… (the first time can take up to a minute)"; btn.disabled = true;
+    try {
+      var d = await AMML.api("/api/auth/login", { method: "POST", body: { email: form.email.value, password: form.password.value } });
+      AMML.setToken(d.token);
+      location.href = dest;
+    } catch (err) {
+      msg.className = "msg err"; msg.textContent = err.message; btn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
