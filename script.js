@@ -766,4 +766,685 @@
   // This script is loaded with a plain <script src="script.js"> tag
   // at the end of <body>, so the DOM is already available.
 })();
-emailjs.send("service_664qy7f","template_pbirglk");
+
+/* =========================================================
+   COURSE SALES SYSTEM (added module)
+   - Rotating course advertisement
+   - Course plans / Buy Now
+   - 3-step checkout (Course -> Student Details -> Payment)
+   - Razorpay integration structure (server-verified)
+   Self-contained: does not touch any code above.
+   ========================================================= */
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------
+     A. CONFIG  — safe for the frontend. NEVER put the Razorpay
+     SECRET key here. Only the public Key ID goes in this file.
+     The secret lives in backend/.env (see backend/README.md).
+     --------------------------------------------------------- */
+  const PAYMENT_CONFIG = {
+    keyId: "rzp_test_TjALWCF8uhQS7x",            // <-- public Key ID (rzp_test_... / rzp_live_...)
+    checkoutEndpoint: "/api/create-order",    // backend: creates the Razorpay order
+    verifyEndpoint: "/api/verify-payment",    // backend: verifies the payment signature
+    businessName: "AM Motion Lab",
+    themeColor: "#2563EB",
+    currency: "INR",
+    checkoutScriptUrl: "https://checkout.razorpay.com/v1/checkout.js",
+  };
+
+  // Certificate details were not supplied, so none are promised here.
+  // Replace this sentence once AM Motion Lab confirms certification terms.
+  const CERTIFICATE_NOTE =
+    "Certificate details for this course will be confirmed by AM Motion Lab at enrolment.";
+
+  const AD_INTERVAL_MS = 6000;
+
+  /* ---------------------------------------------------------
+     B. COURSE DATA (prices and durations exactly as supplied)
+     --------------------------------------------------------- */
+  const LEVEL_ORDER = ["basic", "advanced", "professional"];
+  const LEVEL_LABEL = {
+    basic: "Basic",
+    advanced: "Advanced",
+    professional: "Professional / Job-Oriented",
+  };
+
+  const SUPPORT = {
+    basic: ["Live classes", "Limited doubts", "Basic project feedback"],
+    advanced: [
+      "Live classes",
+      "Regular doubts",
+      "Project reviews",
+      "WhatsApp support",
+      "Portfolio guidance",
+    ],
+    professional: [
+      "Everything in Advanced",
+      "Priority doubt support",
+      "One-to-one project discussion",
+      "WhatsApp support",
+      "Phone call support when required",
+      "Personal project feedback",
+      "Freelancing guidance",
+      "Career guidance",
+    ],
+  };
+
+  const COURSES = {
+    "video-editing": {
+      name: "Video Editing",
+      adHeadline: "Master Video Editing",
+      skills: ["Cutting & pacing", "Sound design", "Colour basics"],
+      levels: {
+        basic: { duration: "3–4 Months", price: 1999 },
+        advanced: { duration: "4–5 Months", price: 3999 },
+        professional: { duration: "5–6 Months", price: 5999 },
+      },
+    },
+    "2d-animation": {
+      name: "2D Animation",
+      adHeadline: "Learn 2D Animation",
+      skills: ["Animation fundamentals", "Animation principles", "Creative visual production"],
+      levels: {
+        basic: { duration: "4–5 Months", price: 6999 },
+        advanced: { duration: "5–6 Months", price: 9999 },
+        professional: { duration: "6–7 Months", price: 13999 },
+      },
+    },
+    "graphic-designing": {
+      name: "Graphic Designing",
+      adHeadline: "Build Professional Design Skills",
+      skills: ["Composition", "Branding basics", "Social creatives"],
+      levels: {
+        basic: { duration: "3–4 Months", price: 1999 },
+        advanced: { duration: "4–5 Months", price: 3999 },
+        professional: { duration: "5–6 Months", price: 5999 },
+      },
+    },
+    "motion-graphics": {
+      name: "Motion Graphics",
+      adHeadline: "Create Professional Motion Graphics",
+      skills: ["Keyframe animation", "Typography motion", "Compositing"],
+      levels: {
+        basic: { duration: "3–4 Months", price: 5999 },
+        advanced: { duration: "4–5 Months", price: 7999 },
+        professional: { duration: "6–7 Months", price: 11999 },
+      },
+    },
+    "3d-animation": {
+      name: "3D Animation",
+      adHeadline: "Learn 3D Animation with Maya",
+      skills: ["3D workflows", "Modelling & animation concepts", "Rendering concepts"],
+      levels: {
+        basic: { duration: "5–6 Months", price: 14999 },
+        advanced: { duration: "6–7 Months", price: 17999 },
+        professional: { duration: "7–8 Months", price: 24999 },
+      },
+    },
+  };
+
+  const COURSE_ORDER = ["video-editing", "2d-animation", "graphic-designing", "motion-graphics", "3d-animation"];
+  const AD_ORDER = ["video-editing", "2d-animation", "motion-graphics", "3d-animation", "graphic-designing"];
+
+  // Course features differ by level. Wording is drawn from the existing site
+  // copy (fundamentals -> applied project work -> professional workflows).
+  function featuresFor(courseId, levelId) {
+    const c = COURSES[courseId];
+    if (levelId === "basic") {
+      return [
+        "Fundamentals of " + c.name,
+        "Core skills: " + c.skills.join(", "),
+        "Practical, project-based learning",
+      ];
+    }
+    if (levelId === "advanced") {
+      return [
+        "Everything in Basic",
+        "Deeper applied practice in " + c.name,
+        "Portfolio-focused project work",
+      ];
+    }
+    return [
+      "Everything in Advanced",
+      "Job-oriented, professional workflows",
+      "Industry-focused projects for freelance or career use",
+    ];
+  }
+
+  function getPlan(courseId, levelId) {
+    const c = COURSES[courseId];
+    const l = c && c.levels[levelId];
+    if (!c || !l) return null;
+    return {
+      courseId: courseId,
+      levelId: levelId,
+      course: c.name,
+      level: LEVEL_LABEL[levelId],
+      duration: l.duration,
+      price: l.price,
+      features: featuresFor(courseId, levelId),
+      support: SUPPORT[levelId],
+    };
+  }
+
+  /* ---------------------------------------------------------
+     C. HELPERS
+     --------------------------------------------------------- */
+  const reducedMotion =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function esc(str) {
+    const d = document.createElement("div");
+    d.textContent = str == null ? "" : String(str);
+    return d.innerHTML;
+  }
+  function rupees(n) {
+    return "\u20B9" + Number(n).toLocaleString("en-IN");
+  }
+  function startingPrice(courseId) {
+    return LEVEL_ORDER.reduce(function (min, lv) {
+      return Math.min(min, COURSES[courseId].levels[lv].price);
+    }, Infinity);
+  }
+  function listHtml(items, cls) {
+    return '<ul class="' + cls + '">' + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+  }
+  function byId(id) { return document.getElementById(id); }
+
+  /* ---------------------------------------------------------
+     D. PLANS SECTION (course tabs + three level cards)
+     --------------------------------------------------------- */
+  const plansTabs = byId("plansTabs");
+  const plansGrid = byId("plansGrid");
+  let planCourse = COURSE_ORDER[0];
+
+  function renderPlans(courseId) {
+    if (!plansGrid || !COURSES[courseId]) return;
+    planCourse = courseId;
+
+    if (plansTabs) {
+      plansTabs.querySelectorAll("[data-plan-course]").forEach(function (tab) {
+        const on = tab.getAttribute("data-plan-course") === courseId;
+        tab.classList.toggle("is-active", on);
+        tab.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
+
+    plansGrid.innerHTML = LEVEL_ORDER.map(function (lv) {
+      const p = getPlan(courseId, lv);
+      return (
+        '<article class="plan-card plan-card--' + lv + '">' +
+          '<p class="plan-card__level">' + esc(p.level) + "</p>" +
+          '<h3 class="plan-card__course">' + esc(p.course) + "</h3>" +
+          '<p class="plan-card__price">' + rupees(p.price) + "</p>" +
+          '<p class="plan-card__duration">' + esc(p.duration) + "</p>" +
+          '<button type="button" class="btn btn--primary plan-card__buy" data-buy-course="' + courseId + '" data-buy-level="' + lv + '">Buy Now</button>' +
+          "<h4>What\u2019s included</h4>" + listHtml(p.features, "plan-card__list") +
+          "<h4>Support</h4>" + listHtml(p.support, "plan-card__list") +
+        "</article>"
+      );
+    }).join("");
+  }
+
+  if (plansTabs) {
+    plansTabs.addEventListener("click", function (e) {
+      const tab = e.target.closest("[data-plan-course]");
+      if (tab) renderPlans(tab.getAttribute("data-plan-course"));
+    });
+  }
+  if (plansGrid) {
+    plansGrid.addEventListener("click", function (e) {
+      const btn = e.target.closest("[data-buy-course]");
+      if (btn) openCheckout(btn.getAttribute("data-buy-course"), btn.getAttribute("data-buy-level"), btn);
+    });
+    renderPlans(planCourse);
+  }
+
+  /* ---------------------------------------------------------
+     E. ROTATING COURSE ADVERTISEMENT
+     --------------------------------------------------------- */
+  (function initAd() {
+    const strip = byId("adStrip");
+    const slide = byId("adSlide");
+    const catEl = byId("adCat");
+    const titleEl = byId("adTitle");
+    const priceEl = byId("adPrice");
+    const cta = byId("adCta");
+    const dots = byId("adDots");
+    const closeBtn = byId("adClose");
+    if (!strip || !slide || !cta) return;
+
+    try {
+      if (window.sessionStorage.getItem("amml_ad_dismissed") === "1") {
+        strip.hidden = true;
+        return;
+      }
+    } catch (err) { /* storage unavailable — show the banner */ }
+
+    let index = 0;
+    let timer = null;
+    let swapToken = 0;
+
+    if (dots) {
+      dots.innerHTML = AD_ORDER.map(function (id, i) {
+        return '<button type="button" class="ad-strip__dot' + (i === 0 ? " is-active" : "") + '" data-ad-index="' + i + '" aria-label="Show ' + esc(COURSES[id].name) + '"></button>';
+      }).join("");
+    }
+
+    function paint(i) {
+      const id = AD_ORDER[i];
+      const c = COURSES[id];
+      catEl.textContent = c.name;
+      titleEl.textContent = c.adHeadline;
+      priceEl.textContent = "Starting at " + rupees(startingPrice(id));
+      cta.setAttribute("aria-label", "Explore course: " + c.name);
+      if (dots) {
+        dots.querySelectorAll(".ad-strip__dot").forEach(function (d, di) {
+          d.classList.toggle("is-active", di === i);
+        });
+      }
+    }
+
+    function show(i) {
+      index = (i + AD_ORDER.length) % AD_ORDER.length;
+      const token = ++swapToken;
+      if (reducedMotion) { paint(index); return; }
+      slide.classList.add("is-swapping");
+      window.setTimeout(function () {
+        if (token !== swapToken) return;
+        paint(index);
+        slide.classList.remove("is-swapping");
+      }, 400);
+    }
+
+    function start() {
+      stop();
+      timer = window.setInterval(function () { show(index + 1); }, AD_INTERVAL_MS);
+    }
+    function stop() {
+      if (timer) { window.clearInterval(timer); timer = null; }
+    }
+
+    paint(0);
+    start();
+
+    // Pause while the visitor is interacting with the banner or the tab is hidden.
+    strip.addEventListener("mouseenter", stop);
+    strip.addEventListener("mouseleave", start);
+    strip.addEventListener("focusin", stop);
+    strip.addEventListener("focusout", start);
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stop(); else if (!strip.hidden) start();
+    });
+
+    if (dots) {
+      dots.addEventListener("click", function (e) {
+        const d = e.target.closest("[data-ad-index]");
+        if (!d) return;
+        show(parseInt(d.getAttribute("data-ad-index"), 10));
+      });
+    }
+
+    cta.addEventListener("click", function () {
+      openCheckout(AD_ORDER[index], "basic", cta);
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", function () {
+        stop();
+        strip.hidden = true;
+        try { window.sessionStorage.setItem("amml_ad_dismissed", "1"); } catch (err) { /* ignore */ }
+      });
+    }
+  })();
+
+  /* ---------------------------------------------------------
+     F. CHECKOUT (3 steps)
+     --------------------------------------------------------- */
+  const overlay = byId("checkoutOverlay");
+  const closeBtn = byId("checkoutClose");
+  const form = byId("checkoutForm");
+  const mainView = byId("coMain");
+  const resultView = byId("coResult");
+  const stepsEl = byId("coSteps");
+  const courseSel = byId("coCourse");
+  const levelSel = byId("coLevel");
+  const summaryEl = byId("coSummary");
+  const reviewEl = byId("coReview");
+  const statusEl = byId("coStatus");
+  const backBtn = byId("coBack");
+  const nextBtn = byId("coNext");
+  const confirmEl = byId("coConfirm");
+  const nameEl = byId("coName");
+  const emailEl = byId("coEmail");
+  const phoneEl = byId("coPhone");
+
+  const state = { step: 1, course: COURSE_ORDER[0], level: "basic", busy: false, trigger: null };
+
+  function currentPlan() { return getPlan(state.course, state.level); }
+
+  if (courseSel) {
+    courseSel.innerHTML = COURSE_ORDER.map(function (id) {
+      return '<option value="' + id + '">' + esc(COURSES[id].name) + "</option>";
+    }).join("");
+  }
+  if (levelSel) {
+    levelSel.innerHTML = LEVEL_ORDER.map(function (id) {
+      return '<option value="' + id + '">' + esc(LEVEL_LABEL[id]) + "</option>";
+    }).join("");
+  }
+
+  function renderSummary() {
+    const p = currentPlan();
+    if (!p || !summaryEl) return;
+    summaryEl.innerHTML =
+      '<div class="co-tiles">' +
+        '<div class="co-tile"><span class="co-tile__label">Course</span><strong>' + esc(p.course) + "</strong></div>" +
+        '<div class="co-tile"><span class="co-tile__label">Level</span><strong>' + esc(p.level) + "</strong></div>" +
+        '<div class="co-tile"><span class="co-tile__label">Duration</span><strong>' + esc(p.duration) + "</strong></div>" +
+        '<div class="co-tile co-tile--price"><span class="co-tile__label">Price</span><strong>' + rupees(p.price) + "</strong></div>" +
+      "</div>" +
+      '<div class="co-cols">' +
+        "<div><h4>Course features</h4>" + listHtml(p.features, "co-list") + "</div>" +
+        "<div><h4>Support included</h4>" + listHtml(p.support, "co-list") + "</div>" +
+      "</div>" +
+      '<div class="co-cert"><h4>Certificate</h4><p>' + esc(CERTIFICATE_NOTE) + "</p></div>";
+  }
+
+  function normalizePhone(value) {
+    let d = String(value).replace(/\D/g, "");
+    if (d.length === 12 && d.indexOf("91") === 0) d = d.slice(2);
+    if (d.length === 11 && d.charAt(0) === "0") d = d.slice(1);
+    return d;
+  }
+
+  function renderReview() {
+    const p = currentPlan();
+    if (!p || !reviewEl) return;
+    function row(label, val, cls) {
+      return '<div class="co-review__row' + (cls || "") + '"><span>' + label + "</span><strong>" + esc(val) + "</strong></div>";
+    }
+    reviewEl.innerHTML =
+      row("Course", p.course) +
+      row("Level", p.level) +
+      row("Duration", p.duration) +
+      row("Student", nameEl.value.trim()) +
+      row("Email", emailEl.value.trim()) +
+      row("Phone", normalizePhone(phoneEl.value)) +
+      row("Total", rupees(p.price), " co-review__row--total");
+  }
+
+  function setStatus(msg, type) {
+    if (!statusEl) return;
+    statusEl.textContent = msg || "";
+    statusEl.classList.remove("is-error", "is-info");
+    if (type) statusEl.classList.add(type);
+  }
+
+  function setFieldError(name, msg) {
+    const err = form.querySelector('[data-co-error="' + name + '"]');
+    const field = err ? err.closest(".field") : null;
+    if (err) err.textContent = msg || "";
+    if (field) field.classList.toggle("has-error", !!msg);
+  }
+
+  function validateStudent() {
+    let ok = true;
+    const name = nameEl.value.trim();
+    if (name.length < 2 || !/[A-Za-z]/.test(name)) {
+      setFieldError("coName", "Please enter the student's full name."); ok = false;
+    } else setFieldError("coName", "");
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
+      setFieldError("coEmail", "Please enter a valid email address."); ok = false;
+    } else setFieldError("coEmail", "");
+
+    if (!/^[6-9]\d{9}$/.test(normalizePhone(phoneEl.value))) {
+      setFieldError("coPhone", "Please enter a valid 10-digit Indian mobile number."); ok = false;
+    } else setFieldError("coPhone", "");
+
+    if (!ok) {
+      const first = form.querySelector(".field.has-error input");
+      if (first) first.focus();
+    }
+    return ok;
+  }
+
+  function setBusy(isBusy, label) {
+    state.busy = isBusy;
+    nextBtn.disabled = isBusy;
+    backBtn.disabled = isBusy;
+    if (isBusy && label) nextBtn.textContent = label;
+    else updateNav();
+  }
+
+  function updateNav() {
+    const p = currentPlan();
+    backBtn.hidden = state.step === 1;
+    if (state.step === 1) nextBtn.textContent = "Continue";
+    else if (state.step === 2) nextBtn.textContent = "Continue";
+    else nextBtn.textContent = "Proceed to Payment \u00B7 " + rupees(p.price);
+  }
+
+  function goToStep(n) {
+    state.step = n;
+    form.querySelectorAll("[data-co-panel]").forEach(function (panel) {
+      panel.hidden = Number(panel.getAttribute("data-co-panel")) !== n;
+    });
+    stepsEl.querySelectorAll(".steps__item").forEach(function (li, i) {
+      li.classList.toggle("is-active", i + 1 === n);
+      li.classList.toggle("is-done", i + 1 < n);
+      if (i + 1 === n) li.setAttribute("aria-current", "step"); else li.removeAttribute("aria-current");
+    });
+    setStatus("");
+    if (n === 3) renderReview();
+    updateNav();
+    const modalBox = overlay.querySelector(".modal");
+    if (modalBox) modalBox.scrollTop = 0;
+    const heading = form.querySelector('[data-co-panel="' + n + '"] .co-heading');
+    if (heading) heading.focus({ preventScroll: true });
+  }
+
+  function syncSelects() {
+    courseSel.value = state.course;
+    levelSel.value = state.level;
+    renderSummary();
+  }
+
+  function openCheckout(courseId, levelId, trigger) {
+    if (!overlay || !COURSES[courseId]) return;
+    state.course = courseId;
+    state.level = LEVEL_ORDER.indexOf(levelId) > -1 ? levelId : "basic";
+    state.trigger = trigger || null;
+    mainView.hidden = false;
+    resultView.hidden = true;
+    confirmEl.checked = false;
+    syncSelects();
+    goToStep(1);
+    setBusy(false);
+
+    overlay.classList.add("is-open");
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    closeBtn.focus();
+  }
+
+  function closeCheckout() {
+    if (!overlay || state.busy) return;
+    overlay.classList.remove("is-open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    if (state.trigger && typeof state.trigger.focus === "function") state.trigger.focus();
+  }
+
+  if (overlay) {
+    closeBtn.addEventListener("click", closeCheckout);
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) closeCheckout(); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay.classList.contains("is-open")) closeCheckout();
+    });
+
+    courseSel.addEventListener("change", function () {
+      state.course = courseSel.value; renderSummary(); updateNav();
+    });
+    levelSel.addEventListener("change", function () {
+      state.level = levelSel.value; renderSummary(); updateNav();
+    });
+
+    [nameEl, emailEl, phoneEl].forEach(function (el) {
+      el.addEventListener("input", function () {
+        if (el.closest(".field").classList.contains("has-error")) validateStudent();
+      });
+    });
+
+    backBtn.addEventListener("click", function () { if (state.step > 1 && !state.busy) goToStep(state.step - 1); });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (state.busy) return;
+      if (state.step === 1) { goToStep(2); return; }
+      if (state.step === 2) { if (validateStudent()) goToStep(3); return; }
+      startPayment();
+    });
+  }
+
+  /* ---------------------------------------------------------
+     G. PAYMENT (Razorpay Standard Checkout, server-verified)
+     Flow:
+       1. POST checkoutEndpoint {courseId, levelId, student}
+          -> backend computes the price itself and creates the order
+       2. Open Razorpay Checkout with the returned order id
+       3. On success POST verifyEndpoint with the three Razorpay values
+          -> backend checks the signature using the SECRET key
+       4. Success is shown ONLY if the backend replies {verified: true}
+     --------------------------------------------------------- */
+  function isPaymentConfigured() {
+    const k = PAYMENT_CONFIG.keyId;
+    return typeof k === "string" && k.length > 0 && k.indexOf("YOUR_") !== 0;
+  }
+
+  function loadRazorpayScript() {
+    return new Promise(function (resolve, reject) {
+      if (window.Razorpay) { resolve(); return; }
+      const s = document.createElement("script");
+      s.src = PAYMENT_CONFIG.checkoutScriptUrl;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error("script")); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function postJson(url, body) {
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: res.ok, data: data };
+      });
+    });
+  }
+
+  function startPayment() {
+    const p = currentPlan();
+    if (!confirmEl.checked) {
+      setStatus("Please confirm that you have reviewed the course details.", "is-error");
+      return;
+    }
+    if (!isPaymentConfigured()) {
+      setStatus("Online payment has not been activated yet, so no payment can be taken. Please contact AM Motion Lab to enrol \u2014 details are in the Contact section.", "is-error");
+      return;
+    }
+
+    const student = {
+      name: nameEl.value.trim(),
+      email: emailEl.value.trim(),
+      phone: normalizePhone(phoneEl.value),
+    };
+
+    setBusy(true, "Preparing secure payment\u2026");
+    setStatus("Creating your order\u2026", "is-info");
+
+    // The price is NOT sent: the server looks it up from its own catalogue.
+    postJson(PAYMENT_CONFIG.checkoutEndpoint, { courseId: p.courseId, levelId: p.levelId, student: student })
+      .then(function (r) {
+        const order = r.data;
+        if (!r.ok || !order || !order.orderId) throw new Error("order");
+        if (Number(order.amount) !== p.price * 100 || order.currency !== PAYMENT_CONFIG.currency) throw new Error("amount");
+        return loadRazorpayScript().then(function () { return order; });
+      })
+      .then(function (order) { openRazorpay(order, p, student); })
+      .catch(function () {
+        setBusy(false);
+        setStatus("We couldn\u2019t start the payment right now. Nothing has been charged. Please try again, or contact AM Motion Lab to enrol.", "is-error");
+      });
+  }
+
+  function openRazorpay(order, p, student) {
+    const rzp = new window.Razorpay({
+      key: PAYMENT_CONFIG.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.orderId,
+      name: PAYMENT_CONFIG.businessName,
+      description: p.course + " \u2014 " + p.level,
+      prefill: { name: student.name, email: student.email, contact: "+91" + student.phone },
+      notes: { course: p.course, level: p.level },
+      theme: { color: PAYMENT_CONFIG.themeColor },
+      modal: {
+        ondismiss: function () {
+          setBusy(false);
+          setStatus("Payment window closed. No payment was completed.", "is-info");
+        },
+      },
+      handler: function (resp) { verifyPayment(resp, p); },
+    });
+    rzp.on("payment.failed", function (ev) {
+      setBusy(false);
+      const d = ev && ev.error && ev.error.description;
+      setStatus((d ? d + " " : "") + "Payment was not completed. You can try again.", "is-error");
+    });
+    setStatus("Complete the payment in the secure payment window.", "is-info");
+    rzp.open();
+  }
+
+  function verifyPayment(resp, p) {
+    setBusy(true, "Verifying payment\u2026");
+    setStatus("Verifying your payment\u2026 please don\u2019t close this window.", "is-info");
+
+    postJson(PAYMENT_CONFIG.verifyEndpoint, {
+      razorpay_order_id: resp.razorpay_order_id,
+      razorpay_payment_id: resp.razorpay_payment_id,
+      razorpay_signature: resp.razorpay_signature,
+    })
+      .then(function (r) {
+        if (r.ok && r.data && r.data.verified === true) showResult(true, p, resp.razorpay_payment_id);
+        else showResult(false, p, resp.razorpay_payment_id);
+      })
+      .catch(function () { showResult(false, p, resp.razorpay_payment_id); });
+  }
+
+  function showResult(success, p, paymentId) {
+    state.busy = false;
+    mainView.hidden = true;
+    resultView.hidden = false;
+    const okIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+    const warnIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 7v6M12 17h.01"/></svg>';
+    resultView.innerHTML = success
+      ? '<div class="co-result__icon co-result__icon--ok">' + okIcon + "</div>" +
+        "<h3>Payment verified</h3>" +
+        "<p>Your payment for <strong>" + esc(p.course) + " \u2014 " + esc(p.level) + "</strong> has been verified.</p>" +
+        '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
+        '<button type="button" class="btn btn--primary" id="coDone">Done</button>'
+      : '<div class="co-result__icon co-result__icon--warn">' + warnIcon + "</div>" +
+        "<h3>We couldn\u2019t verify your payment</h3>" +
+        "<p>Your payment could not be confirmed automatically. If money was deducted, please contact AM Motion Lab with the payment ID below \u2014 do not pay again.</p>" +
+        '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
+        '<button type="button" class="btn btn--ghost" id="coDone">Close</button>';
+    const done = byId("coDone");
+    if (done) done.addEventListener("click", closeCheckout);
+    if (done) done.focus();
+  }
+})();

@@ -65,6 +65,23 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="home">
+  <!-- ===== COURSE ADVERTISEMENT STRIP (added) — sits in the hero's top spacing, scrolls away with the page ===== -->
+  <div class="ad-strip" id="adStrip" role="region" aria-label="Featured course">
+    <div class="ad-strip__wrap">
+      <div class="ad-strip__bar">
+        <span class="ad-strip__label">Courses</span>
+        <div class="ad-strip__slide" id="adSlide">
+          <span class="ad-strip__cat" id="adCat">Video Editing</span>
+          <strong class="ad-strip__title" id="adTitle">Master Video Editing</strong>
+          <span class="ad-strip__price" id="adPrice">Starting at &#8377;1,999</span>
+        </div>
+        <button type="button" class="btn btn--primary btn--sm ad-strip__cta" id="adCta">Explore Course</button>
+        <div class="ad-strip__dots" id="adDots" role="group" aria-label="Choose featured course"></div>
+        <button type="button" class="ad-strip__close" id="adClose" aria-label="Dismiss course banner">&times;</button>
+      </div>
+    </div>
+  </div>
+
   <div class="hero__inner">
     <div class="hero__copy" data-reveal>
       <p class="eyebrow">AM Motion Lab</p>
@@ -245,6 +262,27 @@
       </div>
     </article>
 
+  </div>
+</section>
+
+<!-- ================= COURSE PLANS & ENROLMENT (added) ================= -->
+<section class="plans" id="plans">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Course Plans &amp; Enrolment</p>
+    <h2>Choose your course. Choose your level.</h2>
+    <p class="section-head__sub">Select a course to see the duration, price and support included at each level, then enrol online.</p>
+  </div>
+
+  <div class="plans__inner" data-reveal>
+    <div class="plans__tabs" id="plansTabs" role="group" aria-label="Select a course">
+      <button type="button" class="plans__tab is-active" data-plan-course="video-editing" aria-pressed="true">Video Editing</button>
+      <button type="button" class="plans__tab" data-plan-course="2d-animation" aria-pressed="false">2D Animation</button>
+      <button type="button" class="plans__tab" data-plan-course="graphic-designing" aria-pressed="false">Graphic Designing</button>
+      <button type="button" class="plans__tab" data-plan-course="motion-graphics" aria-pressed="false">Motion Graphics</button>
+      <button type="button" class="plans__tab" data-plan-course="3d-animation" aria-pressed="false">3D Animation</button>
+    </div>
+
+    <div class="plans__grid" id="plansGrid" aria-live="polite"></div>
   </div>
 </section>
 
@@ -651,6 +689,85 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
     <div class="modal__content" id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ================= CHECKOUT MODAL (added: 3-step enrolment + payment) ================= -->
+<div class="modal-overlay" id="checkoutOverlay" aria-hidden="true">
+  <div class="modal checkout" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+    <button type="button" class="modal__close" id="checkoutClose" aria-label="Close enrolment">&times;</button>
+
+    <div id="coMain">
+      <p class="checkout__eyebrow">Enrol</p>
+      <h3 class="checkout__title" id="checkoutTitle">Course Enrolment</h3>
+
+      <ol class="steps" id="coSteps" aria-label="Enrolment progress">
+        <li class="steps__item is-active" aria-current="step"><span class="steps__num">Step 01</span><span class="steps__name">Course</span></li>
+        <li class="steps__item"><span class="steps__num">Step 02</span><span class="steps__name">Student Details</span></li>
+        <li class="steps__item"><span class="steps__num">Step 03</span><span class="steps__name">Payment</span></li>
+      </ol>
+
+      <form id="checkoutForm" novalidate>
+
+        <!-- STEP 1 -->
+        <div class="co-panel" data-co-panel="1">
+          <h4 class="co-heading" tabindex="-1">Course details</h4>
+          <div class="co-row">
+            <div class="field">
+              <label for="coCourse">Course</label>
+              <select id="coCourse" name="course"></select>
+            </div>
+            <div class="field">
+              <label for="coLevel">Level</label>
+              <select id="coLevel" name="level"></select>
+            </div>
+          </div>
+          <div id="coSummary" class="co-summary" aria-live="polite"></div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="co-panel" data-co-panel="2" hidden>
+          <h4 class="co-heading" tabindex="-1">Student details</h4>
+          <div class="field">
+            <label for="coName">Student Name</label>
+            <input type="text" id="coName" name="coName" autocomplete="name" required>
+            <span class="field__error" data-co-error="coName"></span>
+          </div>
+          <div class="co-row">
+            <div class="field">
+              <label for="coEmail">Email</label>
+              <input type="email" id="coEmail" name="coEmail" autocomplete="email" required>
+              <span class="field__error" data-co-error="coEmail"></span>
+            </div>
+            <div class="field">
+              <label for="coPhone">Phone Number</label>
+              <input type="tel" id="coPhone" name="coPhone" autocomplete="tel" inputmode="tel" placeholder="10-digit mobile number" required>
+              <span class="field__error" data-co-error="coPhone"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="co-panel" data-co-panel="3" hidden>
+          <h4 class="co-heading" tabindex="-1">Review &amp; pay</h4>
+          <div id="coReview" class="co-review"></div>
+          <label class="co-check">
+            <input type="checkbox" id="coConfirm">
+            <span>I have reviewed the course, level, duration and price above.</span>
+          </label>
+          <p class="co-secure">Payment is completed on the payment gateway's secure window. AM Motion Lab does not see or store your card or UPI details.</p>
+        </div>
+
+        <div class="co-status" id="coStatus" role="status" aria-live="polite"></div>
+
+        <div class="co-actions">
+          <button type="button" class="btn btn--ghost" id="coBack" hidden>Back</button>
+          <button type="submit" class="btn btn--primary" id="coNext">Continue</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="coResult" class="co-result" hidden></div>
   </div>
 </div>
 
