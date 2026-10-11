@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — AM Motion Lab</title>
+<meta name="description" content="AM Motion Lab is an online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.">
+<link rel="icon" type="image/png" href="image_web/icon_logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Background connective layer: shared gradient glows that run behind every section -->
+<div class="bg-field" aria-hidden="true">
+  <div class="glow glow--one"></div>
+  <div class="glow glow--two"></div>
+  <div class="glow glow--three"></div>
+  <div class="glow glow--four"></div>
+  <div class="spine"></div>
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="AM Motion Lab home">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="nav__logo-full">
+      <img src="image_web/icon_logo.png" alt="AM Motion Lab" class="nav__logo-icon">
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="courses.html">Courses</a>
+      <a href="projects.html">Projects</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html" aria-current="page">Contact</a>
+    </nav>
+
+    <a href="contact.html" class="btn btn--primary nav__cta">Start Learning</a>
+
+    <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="learn.html">Learn</a>
+    <a href="courses.html">Courses</a>
+    <a href="projects.html">Projects</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html" aria-current="page">Contact</a>
+    <a href="contact.html" class="btn btn--primary">Start Learning</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= CONTACT / ENQUIRY ================= -->
+<section class="contact page-first" id="contact">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Contact</p>
+    <h2>Tell us what you want to create.</h2>
+    <p class="section-head__sub">Send an enquiry and we'll get back to you — or reach out directly using the details below.</p>
+  </div>
+
+  <div class="contact__inner" data-reveal>
+
+    <div class="contact__details">
+      <a class="contact__link" href="mailto:funflip8434ankit@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6l9 7 9-7"/></svg>
+        <span>funflip8434ankit@gmail.com</span>
+      </a>
+      <a class="contact__link" href="tel:+918434959801">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2C9.5 21 3 14.5 3 6a2 2 0 0 1 1-2z"/></svg>
+        <span>8434959801</span>
+      </a>
+      <a class="contact__link" href="tel:+918873181698">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2C9.5 21 3 14.5 3 6a2 2 0 0 1 1-2z"/></svg>
+        <span>8873181698</span>
+      </a>
+      <a class="contact__link" href="https://instagram.com/am_motion_77" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+        <span>Instagram — am_motion_77</span>
+      </a>
+      <a class="contact__link" href="https://youtube.com/@ammotion18" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M10.5 9.5l5 2.5-5 2.5v-5z" fill="currentColor" stroke="none"/></svg>
+        <span>YouTube — @ammotion18</span>
+      </a>
+    </div>
+
+    <form class="enquiry" id="enquiryForm" novalidate>
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required autocomplete="name">
+          <span class="field__error" data-error-for="fullName"></span>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+          <span class="field__error" data-error-for="email"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel">
+          <span class="field__error" data-error-for="phone"></span>
+        </div>
+        <div class="field">
+          <label for="interest">Interested In</label>
+          <select id="interest" name="interest" required>
+            <option value="" disabled selected>Select an area</option>
+            <option>Video Editing</option>
+            <option>Motion Graphics</option>
+            <option>2D Animation</option>
+            <option>3D Animation</option>
+            <option>Graphic Design</option>
+            <option>Other</option>
+          </select>
+          <span class="field__error" data-error-for="interest"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="experience">Experience Level</label>
+          <select id="experience" name="experience" required>
+            <option value="" disabled selected>Select your level</option>
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+          <span class="field__error" data-error-for="experience"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        <span class="field__error" data-error-for="message"></span>
+      </div>
+
+      <div class="field">
+        <label>Upload your work / reference</label>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a file: PDF, JPG, PNG or MP4, up to 20 megabytes">
+          <input type="file" id="fileInput" name="file" accept=".pdf,.jpg,.jpeg,.png,.mp4" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <p><strong>Upload your work / reference</strong></p>
+          <p class="dropzone__hint">PDF, JPG, PNG or MP4 — click or drag a file here, up to 20MB</p>
+        </div>
+        <div class="dropzone__file" id="fileChosen" hidden>
+          <span id="fileName"></span>
+          <button type="button" id="fileRemove" aria-label="Remove selected file">&times;</button>
+        </div>
+        <span class="field__error" data-error-for="file"></span>
+      </div>
+
+      <button type="submit" class="btn btn--primary enquiry__submit">
+        <span>Submit Enquiry</span>
+      </button>
+
+      <div class="enquiry__status" id="enquiryStatus" role="status" aria-live="polite"></div>
+    </form>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="footer__logo">
+      <p class="footer__tagline">Learn &bull; Create &bull; Earn</p>
+      <p class="footer__desc">An online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Navigate</h4>
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="courses.html">Courses</a>
+      <a href="projects.html">Projects</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Learning Areas</h4>
+      <span>Video Editing</span>
+      <span>Motion Graphics</span>
+      <span>2D &amp; 3D Animation</span>
+      <span>Graphic Design</span>
+    </div>
+
+    <div class="footer__col">
+      <h4>Contact</h4>
+      <a href="mailto:funflip8434ankit@gmail.com">funflip8434ankit@gmail.com</a>
+      <a href="tel:+918434959801">8434959801</a>
+      <a href="tel:+918873181698">8873181698</a>
+      <a href="https://instagram.com/am_motion_77" target="_blank" rel="noopener">Instagram — am_motion_77</a>
+      <a href="https://youtube.com/@ammotion18" target="_blank" rel="noopener">YouTube — @ammotion18</a>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <p>&copy; <span id="year"></span> AM Motion Lab. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</body>
+</html>

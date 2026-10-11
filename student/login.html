@@ -29,7 +29,7 @@
   var form = document.getElementById("f"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
   document.getElementById("alt").href = "register.html" + location.search;
   var next = new URLSearchParams(location.search).get("next");
-  var dest = next === "courses" ? "../index.html#courses" : "dashboard.html";
+  var dest = next === "courses" ? "../courses.html" : "dashboard.html";
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
     msg.className = "msg"; msg.textContent = "Logging in… (the first time can take up to a minute)"; btn.disabled = true;

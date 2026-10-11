@@ -1492,3 +1492,21 @@ section{
   .co-actions #coNext{ margin-left: 0; }
   .plan-card{ padding: 24px 22px; }
 }
+
+/* =========================================================
+   MULTI-PAGE ADDITIONS
+   - space under the fixed navbar on pages that don't start with the hero
+   - highlight the current page in the navbar
+   ========================================================= */
+section.page-first{ padding-top: 150px; }
+@media (max-width: 760px){ section.page-first{ padding-top: 120px; } }
+.nav__links a[aria-current="page"]{ color: var(--off-white); }
+.nav__links a[aria-current="page"]::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -8px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient-brand);
+}
+.mobile-menu a[aria-current="page"]{ color: var(--sky); }

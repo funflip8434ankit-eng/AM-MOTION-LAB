@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — AM Motion Lab</title>
+<meta name="description" content="AM Motion Lab is an online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.">
+<link rel="icon" type="image/png" href="image_web/icon_logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Background connective layer: shared gradient glows that run behind every section -->
+<div class="bg-field" aria-hidden="true">
+  <div class="glow glow--one"></div>
+  <div class="glow glow--two"></div>
+  <div class="glow glow--three"></div>
+  <div class="glow glow--four"></div>
+  <div class="spine"></div>
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo" aria-label="AM Motion Lab home">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="nav__logo-full">
+      <img src="image_web/icon_logo.png" alt="AM Motion Lab" class="nav__logo-icon">
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="courses.html">Courses</a>
+      <a href="projects.html" aria-current="page">Projects</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <a href="contact.html" class="btn btn--primary nav__cta">Start Learning</a>
+
+    <button class="nav__burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="learn.html">Learn</a>
+    <a href="courses.html">Courses</a>
+    <a href="projects.html" aria-current="page">Projects</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="contact.html" class="btn btn--primary">Start Learning</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= PROJECTS / SHOWCASE ================= -->
+<section class="projects page-first" id="projects">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Learn Through Projects</p>
+    <h2>Practical projects turn learning into ability.</h2>
+    <p class="section-head__sub">Working on real briefs is how creative skills are actually applied. Project visuals below will be added as student and studio work becomes available.</p>
+  </div>
+
+  <div class="masonry" data-reveal>
+
+    <button class="masonry__item masonry__item--16-9" data-project="edit-reel">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+        <p class="media-frame__label">Editing Project</p>
+        <p class="media-frame__hint">16:9</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--1-1" data-project="brand-identity">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
+        <p class="media-frame__label">Design Project</p>
+        <p class="media-frame__hint">1:1</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--4-5" data-project="motion-title">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 8 8"/><path d="M4 12l3-3M4 12l3 3"/></svg>
+        <p class="media-frame__label">Motion Project</p>
+        <p class="media-frame__hint">4:5</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--1-1" data-project="character-render">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/></svg>
+        <p class="media-frame__label">Animation Project</p>
+        <p class="media-frame__hint">1:1</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--16-9" data-project="social-campaign">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
+        <p class="media-frame__label">Design Project</p>
+        <p class="media-frame__hint">16:9</p>
+      </div>
+    </button>
+
+    <button class="masonry__item masonry__item--4-5" data-project="sound-edit">
+      <div class="media-frame__inner">
+        <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+        <p class="media-frame__label">Editing Project</p>
+        <p class="media-frame__hint">4:5</p>
+      </div>
+    </button>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ================= MODAL (shared: learning areas, courses, projects) ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal__content" id="modalContent"></div>
+  </div>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <img src="image_web/full-logo.png" alt="AM Motion Lab" class="footer__logo">
+      <p class="footer__tagline">Learn &bull; Create &bull; Earn</p>
+      <p class="footer__desc">An online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.</p>
+    </div>
+
+    <div class="footer__col">
+      <h4>Navigate</h4>
+      <a href="index.html">Home</a>
+      <a href="learn.html">Learn</a>
+      <a href="courses.html">Courses</a>
+      <a href="projects.html">Projects</a>
+      <a href="about.html">About</a>
+      <a href="faq.html">FAQ</a>
+    </div>
+
+    <div class="footer__col">
+      <h4>Learning Areas</h4>
+      <span>Video Editing</span>
+      <span>Motion Graphics</span>
+      <span>2D &amp; 3D Animation</span>
+      <span>Graphic Design</span>
+    </div>
+
+    <div class="footer__col">
+      <h4>Contact</h4>
+      <a href="mailto:funflip8434ankit@gmail.com">funflip8434ankit@gmail.com</a>
+      <a href="tel:+918434959801">8434959801</a>
+      <a href="tel:+918873181698">8873181698</a>
+      <a href="https://instagram.com/am_motion_77" target="_blank" rel="noopener">Instagram — am_motion_77</a>
+      <a href="https://youtube.com/@ammotion18" target="_blank" rel="noopener">YouTube — @ammotion18</a>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <p>&copy; <span id="year"></span> AM Motion Lab. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

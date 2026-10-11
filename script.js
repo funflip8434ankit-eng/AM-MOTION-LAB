@@ -349,7 +349,7 @@
         escapeHtml(desc) +
         "</p>" +
         skillsHtml +
-        '<p style="margin-top:18px;"><a class="btn btn--primary btn--sm" href="#contact">Enquire About This Course</a></p>';
+        '<p style="margin-top:18px;"><a class="btn btn--primary btn--sm" href="contact.html">Enquire About This Course</a></p>';
 
       openModal(html);
     });
