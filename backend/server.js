@@ -6,9 +6,11 @@
 require("dotenv").config();
 
 const path = require("path");
+const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
 const Razorpay = require("razorpay");
+const pool = require("./db");
 
 const KEY_ID = process.env.RAZORPAY_KEY_ID;
 const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
@@ -55,6 +57,7 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "10kb" }));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api", require("./routes/payment")(razorpay, KEY_SECRET, PRICES));
+app.use("/api/learning", require("./routes/learning"));
 /* ---------- 1. Create order ---------- */
 app.post("/api/create-order", async (req, res) => {
   try {
@@ -120,4 +123,9 @@ app.post("/api/verify-payment", async (req, res) => {
 app.use("/backend", (req, res) => res.status(404).end());
 app.use(express.static(path.join(__dirname, ".."), { dotfiles: "deny" }));
 
-app.listen(PORT, () => console.log("AM Motion Lab running at http://localhost:" + PORT));
+pool.query(fs.readFileSync(path.join(__dirname, "course-schema.sql"), "utf8"))
+  .then(() => app.listen(PORT, () => console.log("AM Motion Lab running at http://localhost:" + PORT)))
+  .catch((err) => {
+    console.error("Could not prepare course progress tables:", err && err.message);
+    process.exit(1);
+  });

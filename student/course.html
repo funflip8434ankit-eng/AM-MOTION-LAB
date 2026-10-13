@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Course — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body>
+<main class="auth">
+	<section class="auth__card" style="max-width:760px" aria-labelledby="course-title">
+		<a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+		<a class="portal-link" href="dashboard.html" style="margin:0 0 22px">Back to dashboard</a>
+		<h1 id="course-title">Loading course…</h1>
+		<p class="sub" id="course-overview">Please wait while we load your lessons.</p>
+		<div id="course-content" hidden>
+			<div class="course-progress" aria-live="polite">
+				<div class="course-progress__label"><span>Course progress</span><span id="progress-count">0 / 0 lessons</span></div>
+				<div class="course-progress__track" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+					<div class="course-progress__value" id="progress-value"></div>
+				</div>
+			</div>
+			<p class="course-message" id="course-message" role="status"></p>
+			<div id="lesson-groups"></div>
+			<div id="course-award" hidden></div>
+		</div>
+		<button class="btn" id="logout" type="button" style="margin-top:20px">Log out</button>
+	</section>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(async function () {
+	if (!AMML.getToken()) { location.replace("login.html"); return; }
+	var params = new URLSearchParams(location.search);
+	var courseId = params.get("course") || "";
+	var levelId = params.get("level") || "";
+	var title = document.getElementById("course-title");
+	var overview = document.getElementById("course-overview");
+	var content = document.getElementById("course-content");
+	var message = document.getElementById("course-message");
+	var groups = document.getElementById("lesson-groups");
+
+	document.getElementById("logout").addEventListener("click", function () {
+		AMML.clearToken();
+		location.replace("login.html");
+	});
+
+	function showCertificate(certificate) {
+		var box = document.getElementById("course-award");
+		box.replaceChildren();
+		var record = document.createElement("section");
+		record.className = "certificate-record";
+		var heading = document.createElement("h2");
+		heading.textContent = "Course complete. Your certificate is ready.";
+		var copy = document.createElement("p");
+		copy.textContent = "Certificate " + certificate.certificate_number + " has been issued.";
+		var link = document.createElement("a");
+		link.className = "portal-link";
+		link.href = "certificate.html?id=" + encodeURIComponent(certificate.id);
+		link.textContent = "View and print certificate";
+		record.append(heading, copy, link);
+		box.appendChild(record);
+		box.hidden = false;
+	}
+
+	async function loadCourse() {
+		message.textContent = "";
+		message.className = "course-message";
+		try {
+			var data = await AMML.api("/api/learning/courses/" + encodeURIComponent(courseId) + "?levelId=" + encodeURIComponent(levelId));
+			title.textContent = data.courseName + " — " + data.levelName;
+			overview.textContent = data.overview + " Mark each lesson complete after you finish it; a certificate is issued when all lessons in this level are complete.";
+			document.title = data.courseName + " — AM Motion Lab";
+			document.getElementById("progress-count").textContent = data.completedCount + " / " + data.lessons.length + " lessons";
+			var percentage = Math.round(data.completedCount / data.lessons.length * 100);
+			document.getElementById("progress-value").style.width = percentage + "%";
+			document.getElementById("progress-track").setAttribute("aria-valuenow", String(percentage));
+			groups.replaceChildren();
+			data.lessons.forEach(function (lesson) {
+				var module = groups.querySelector('[data-module="' + lesson.module + '"]');
+				if (!module) {
+					module = document.createElement("section");
+					module.className = "lesson-module";
+					module.dataset.module = lesson.module;
+					var heading = document.createElement("h2");
+					heading.textContent = lesson.module;
+					var list = document.createElement("ul");
+					list.className = "lesson-list";
+					module.append(heading, list);
+					groups.appendChild(module);
+				}
+				var item = document.createElement("li");
+				item.className = "lesson-row";
+				var copy = document.createElement("div");
+				copy.className = "lesson-row__copy";
+				var name = document.createElement("strong");
+				name.textContent = lesson.title;
+				var outcome = document.createElement("span");
+				outcome.textContent = lesson.outcome;
+				copy.append(name, outcome);
+				var button = document.createElement("button");
+				button.className = "lesson-action";
+				button.type = "button";
+				button.textContent = lesson.completed ? "Completed" : "Mark complete";
+				button.disabled = lesson.completed;
+				button.addEventListener("click", async function () {
+					button.disabled = true;
+					message.textContent = "Saving lesson progress…";
+					try {
+						var result = await AMML.api("/api/learning/courses/" + encodeURIComponent(courseId) + "/lessons/" + encodeURIComponent(lesson.id) + "/complete", {
+							method: "POST",
+							body: { levelId: levelId }
+						});
+						await loadCourse();
+						if (result.certificate) showCertificate(result.certificate);
+						else message.textContent = "Lesson marked complete.";
+					} catch (error) {
+						button.disabled = false;
+						message.textContent = error.message;
+						message.className = "course-message err";
+					}
+				});
+				item.append(copy, button);
+				module.querySelector(".lesson-list").appendChild(item);
+			});
+			content.hidden = false;
+			document.getElementById("course-award").hidden = !data.certificate;
+			if (data.certificate) showCertificate(data.certificate);
+		} catch (error) {
+			if (error.status === 401) {
+				AMML.clearToken();
+				location.replace("login.html");
+			} else {
+				title.textContent = "Course unavailable";
+				overview.textContent = error.message;
+			}
+		}
+	}
+
+	await loadCourse();
+})();
+</script>
+</body>
+</html>

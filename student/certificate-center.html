@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate Center — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body>
+<main class="auth">
+  <section class="auth__card" style="max-width:640px" aria-labelledby="hello">
+    <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+    <a class="portal-link" href="dashboard.html" style="margin:0 0 22px">Back to dashboard</a>
+    <h1 id="hello">Certificate center</h1>
+    <p class="sub" id="sub">Checking your account…</p>
+    <div id="certificate-content" hidden>
+      <section class="certificate-record" id="empty-state" aria-labelledby="empty-title" hidden>
+        <h2 id="empty-title">No certificates issued yet</h2>
+        <p>When an eligible course is completed and a certificate is issued, it will appear here.</p>
+      </section>
+      <div id="certificate-list"></div>
+    </div>
+    <button class="btn" id="logout" type="button">Log out</button>
+  </section>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(async function () {
+  if (!AMML.getToken()) { location.replace("login.html"); return; }
+  var hello = document.getElementById("hello");
+  var sub = document.getElementById("sub");
+  document.getElementById("logout").addEventListener("click", function () {
+    AMML.clearToken();
+    location.replace("login.html");
+  });
+  try {
+    var data = await AMML.api("/api/auth/me");
+    sub.textContent = "Certificate records for " + data.user.name;
+    var result = await AMML.api("/api/learning/certificates");
+    var list = document.getElementById("certificate-list");
+    document.getElementById("empty-state").hidden = result.certificates.length !== 0;
+    result.certificates.forEach(function (certificate) {
+      var item = document.createElement("section");
+      item.className = "certificate-record";
+      var title = document.createElement("h2");
+      title.textContent = certificate.course_name + " — " + AMML.levelName(certificate.level_id);
+      var details = document.createElement("p");
+      details.textContent = "Issued " + new Date(certificate.issued_at).toLocaleDateString() + " · " + certificate.certificate_number;
+      var link = document.createElement("a");
+      link.className = "portal-link";
+      link.href = "certificate.html?id=" + encodeURIComponent(certificate.id);
+      link.textContent = "View and print certificate";
+      item.append(title, details, link);
+      list.appendChild(item);
+    });
+    document.getElementById("certificate-content").hidden = false;
+  } catch (error) {
+    if (error.status === 401) {
+      AMML.clearToken();
+      location.replace("login.html");
+    } else {
+      hello.textContent = "Unable to load certificate center";
+      sub.textContent = error.message;
+    }
+  }
+})();
+</script>
+</body>
+</html>

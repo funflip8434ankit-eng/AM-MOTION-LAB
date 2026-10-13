@@ -21,6 +21,14 @@ npm start                # http://localhost:3000 (site + /api)
 - `POST /api/verify-payment` — receives Razorpay's order/payment/signature, checks the HMAC with the secret. Returns `{verified:true}` only if genuine. The website shows success only on this reply.
 
 ## Keep in sync
+Course progress and certificates:
+- `GET /api/learning/courses/:courseId?levelId=basic|advanced|professional` returns a student's lessons and saved progress.
+- `POST /api/learning/courses/:courseId/lessons/:lessonId/complete` records a completed lesson and issues a certificate when every lesson in that level is complete.
+- `GET /api/learning/certificates` and `GET /api/learning/certificates/:id` list and retrieve the logged-in student's certificates.
+- Progress tables are created from `course-schema.sql` when the server starts. Editable starter curricula for the five catalog courses are in `curriculum.js`.
+
+Students mark each lesson complete after finishing it. Progress is tied to their account and requires paid course access; certificate issuance is saved once per course level.
+
 Prices exist in `server.js` (authoritative) and `script.js` (display). Change both together.
 
 ## Still to add before going live

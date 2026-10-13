@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate — AM Motion Lab</title>
+<link rel="icon" href="../image_web/icon_logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../student_assets/student.css">
+</head>
+<body class="certificate-page">
+<main class="certificate-view">
+  <div>
+    <article class="certificate-sheet" id="certificate" hidden>
+      <div class="certificate-sheet__content">
+        <header class="certificate-sheet__header">
+          <img src="../image_web/icon_logo.png" alt="" class="certificate-sheet__logo">
+          <p class="certificate-sheet__brand">AM Motion Lab</p>
+        </header>
+        <h1>Course Completion Certificate</h1>
+        <p class="certificate-sheet__lead">This certifies that</p>
+        <p class="certificate-sheet__name" id="student-name"></p>
+        <p class="certificate-sheet__lead">has successfully completed the course</p>
+        <p class="certificate-sheet__course" id="course-name"></p>
+        <p class="certificate-sheet__level" id="course-level"></p>
+        <div class="certificate-sheet__signature" aria-hidden="true"><span></span><small>AM Motion Lab · Authorized Signature</small></div>
+        <div class="certificate-sheet__meta">
+          <span>Issued<strong id="issued-date"></strong></span>
+          <span>Certificate ID<strong id="certificate-number"></strong></span>
+        </div>
+      </div>
+    </article>
+    <p class="sub" id="status" role="status">Loading certificate…</p>
+    <div class="certificate-actions" id="actions" hidden>
+      <button class="btn" type="button" id="print-certificate">Print / Save as PDF</button>
+      <a class="portal-link" href="certificate-center.html">Certificate center</a>
+    </div>
+  </div>
+</main>
+<script src="../student_assets/student.js"></script>
+<script>
+(async function () {
+  if (!AMML.getToken()) { location.replace("login.html"); return; }
+  var status = document.getElementById("status");
+  document.getElementById("print-certificate").addEventListener("click", function () { window.print(); });
+  try {
+    var id = new URLSearchParams(location.search).get("id");
+    if (!id || !/^\d+$/.test(id)) throw new Error("Certificate not found.");
+    var result = await AMML.api("/api/learning/certificates/" + encodeURIComponent(id));
+    var certificate = result.certificate;
+    document.getElementById("student-name").textContent = certificate.student_name;
+    document.getElementById("course-name").textContent = certificate.course_name;
+    document.getElementById("course-level").textContent = AMML.levelName(certificate.level_id);
+    document.getElementById("issued-date").textContent = new Date(certificate.issued_at).toLocaleDateString();
+    document.getElementById("certificate-number").textContent = certificate.certificate_number;
+    document.getElementById("certificate").hidden = false;
+    document.getElementById("actions").hidden = false;
+    status.hidden = true;
+  } catch (error) {
+    if (error.status === 401) {
+      AMML.clearToken();
+      location.replace("login.html");
+    } else {
+      status.textContent = error.message;
+    }
+  }
+})();
+</script>
+</body>
+</html>

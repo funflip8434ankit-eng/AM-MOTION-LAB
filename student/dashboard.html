@@ -15,6 +15,7 @@
     <h1 id="hello">Loading…</h1>
     <p class="sub" id="sub">Please wait…</p>
     <div id="courses"></div>
+    <a class="portal-link" href="certificate-center.html">Certificate center</a>
     <button class="btn" id="logout" type="button" style="margin-top:20px">Log out</button>
   </div>
 </main>
@@ -37,7 +38,10 @@
         var row = document.createElement("div"); row.className = "course-item";
         var n = document.createElement("strong"); n.textContent = AMML.courseName(c.courseId);
         var t = document.createElement("span"); t.className = "tag"; t.textContent = AMML.levelName(c.levelId);
-        row.appendChild(n); row.appendChild(t); box.appendChild(row);
+        var open = document.createElement("a");
+        open.href = "course.html?course=" + encodeURIComponent(c.courseId) + "&level=" + encodeURIComponent(c.levelId);
+        open.textContent = "Open course";
+        row.appendChild(n); row.appendChild(t); row.appendChild(open); box.appendChild(row);
       });
     }
   } catch (e) {
