@@ -164,6 +164,15 @@ section{
   padding: 10px 4px;
   border-bottom: 1px solid transparent;
 }
+.certificate-promo{padding:72px 24px}
+.certificate-promo__inner{
+  max-width:var(--container);margin:0 auto;padding:36px 40px;border:1px solid var(--glass-border);
+  border-radius:24px;background:linear-gradient(120deg,rgba(37,99,235,.18),rgba(109,40,217,.13));
+  display:flex;align-items:center;justify-content:space-between;gap:28px
+}
+.certificate-promo__inner h2{max-width:22ch;font-size:clamp(1.6rem,3vw,2.25rem);line-height:1.25}
+.certificate-promo__inner p:not(.eyebrow){max-width:58ch;margin-top:12px;color:var(--ink-dim)}
+@media(max-width:640px){.certificate-promo__inner{align-items:flex-start;flex-direction:column;padding:28px 24px}}
 .btn--text:hover{ border-color: var(--sky); }
 
 /* =========================================================
@@ -1089,6 +1098,14 @@ section{
   .about__inner{ grid-template-columns: 1fr; }
   .about__media{ order: -1; max-width: 380px; margin: 0 auto; }
   .contact__inner{ grid-template-columns: 1fr; }
+}
+
+@media (max-width: 1040px){
+  .nav__links{ display: none; }
+  .nav__cta{ display: none; }
+  .nav__burger{ display: flex; margin-left: auto; }
+  .nav__logo-full{ display: none; }
+  .nav__logo-icon{ display: block; }
 }
 
 @media (max-width: 760px){
