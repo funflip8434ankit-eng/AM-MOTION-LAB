@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const crypto = require("crypto");
 const pool = require("../db");
 const requireAuth = require("../middleware/requireAuth");
@@ -7,9 +8,16 @@ const RANK = { basic: 1, advanced: 2, professional: 3 };
 
 module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
   const router = express.Router();
+  const checkoutLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many checkout attempts. Please wait and try again." },
+  });
 
   /* ---------- Create order (login required) ---------- */
-  router.post("/create-order", requireAuth, async (req, res) => {
+  router.post("/create-order", checkoutLimiter, requireAuth, async (req, res) => {
     try {
       const { courseId, levelId } = req.body || {};
       const price = PRICES[courseId] && PRICES[courseId][levelId];
@@ -50,7 +58,7 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
   });
 
   /* ---------- Verify payment + create enrollment (login required) ---------- */
-  router.post("/verify-payment", requireAuth, async (req, res) => {
+  router.post("/verify-payment", checkoutLimiter, requireAuth, async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
     if (![razorpay_order_id, razorpay_payment_id, razorpay_signature].every((v) => typeof v === "string" && v)) {
       return res.status(400).json({ verified: false });

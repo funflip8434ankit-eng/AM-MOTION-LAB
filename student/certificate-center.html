@@ -8,51 +8,101 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../student_assets/student.css">
 </head>
-<body>
-<main class="auth">
-  <section class="auth__card" style="max-width:640px" aria-labelledby="hello">
-    <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
-    <a class="portal-link" href="dashboard.html" style="margin:0 0 22px">Back to dashboard</a>
-    <h1 id="hello">Certificate center</h1>
-    <p class="sub" id="sub">Checking your account…</p>
-    <div id="certificate-content" hidden>
-      <section class="certificate-record" id="empty-state" aria-labelledby="empty-title" hidden>
-        <h2 id="empty-title">No certificates issued yet</h2>
-        <p>When an eligible course is completed and a certificate is issued, it will appear here.</p>
-      </section>
-      <div id="certificate-list"></div>
-    </div>
-    <button class="btn" id="logout" type="button">Log out</button>
-  </section>
+<body class="certificate-center-page">
+<main class="certificate-hub">
+  <div class="certificate-hub__wrap">
+    <header class="certificate-hub__topbar">
+      <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
+      <div class="certificate-hub__actions">
+        <a href="dashboard.html" class="certificate-hub__back">← Dashboard</a>
+        <button class="certificate-hub__logout" id="logout" type="button">Log out</button>
+      </div>
+    </header>
+
+    <section class="certificate-hub__hero" aria-labelledby="hello">
+      <div class="certificate-hub__hero-copy">
+        <p class="certificate-hub__eyebrow"><span></span> Student achievement archive</p>
+        <h1 id="hello">Your achievements,<br><em>beautifully earned.</em></h1>
+        <p class="certificate-hub__sub" id="sub">Loading your learning milestones…</p>
+      </div>
+      <div class="certificate-hub__total" aria-live="polite">
+        <span class="certificate-hub__total-icon" aria-hidden="true">✦</span>
+        <strong id="certificate-count">—</strong>
+        <span>certificates earned</span>
+      </div>
+      <div class="certificate-hub__orb certificate-hub__orb--one" aria-hidden="true"></div>
+      <div class="certificate-hub__orb certificate-hub__orb--two" aria-hidden="true"></div>
+    </section>
+
+    <section class="certificate-hub__collection" aria-labelledby="collection-title">
+      <div class="certificate-hub__section-head">
+        <div><p class="certificate-hub__eyebrow">Your collection</p><h2 id="collection-title">Milestones</h2></div>
+        <a href="../courses.html" class="certificate-hub__explore">Explore courses <span aria-hidden="true">↗</span></a>
+      </div>
+      <div id="certificate-content" hidden>
+        <section class="certificate-hub__empty" id="empty-state" aria-labelledby="empty-title" hidden>
+          <span class="certificate-hub__empty-icon" aria-hidden="true">✧</span>
+          <div><h3 id="empty-title">Your first certificate is waiting.</h3><p>Complete every lesson in an eligible course level and your certificate will appear here.</p></div>
+          <a href="../courses.html" class="certificate-hub__empty-link">Browse courses <span aria-hidden="true">→</span></a>
+        </section>
+        <div class="certificate-hub__grid" id="certificate-list"></div>
+      </div>
+    </section>
+    <footer class="certificate-hub__footer"><span>Every finished course tells a story.</span><span>AM Motion Lab <b>✦</b></span></footer>
+  </div>
 </main>
 <script src="../student_assets/student.js"></script>
 <script>
 (async function () {
-  if (!AMML.getToken()) { location.replace("login.html"); return; }
+  if (!AMML.getToken()) { location.replace("login.html?next=certificates"); return; }
   var hello = document.getElementById("hello");
   var sub = document.getElementById("sub");
+  var count = document.getElementById("certificate-count");
   document.getElementById("logout").addEventListener("click", function () {
     AMML.clearToken();
     location.replace("login.html");
   });
   try {
     var data = await AMML.api("/api/auth/me");
-    sub.textContent = "Certificate records for " + data.user.name;
+    sub.textContent = "A record of the skills you have built, " + data.user.name + ". Keep going—your next milestone is ahead.";
     var result = await AMML.api("/api/learning/certificates");
     var list = document.getElementById("certificate-list");
+    count.textContent = String(result.certificates.length).padStart(2, "0");
     document.getElementById("empty-state").hidden = result.certificates.length !== 0;
-    result.certificates.forEach(function (certificate) {
+    result.certificates.forEach(function (certificate, index) {
       var item = document.createElement("section");
-      item.className = "certificate-record";
+      item.className = "certificate-hub__card";
+      var top = document.createElement("div");
+      top.className = "certificate-hub__card-top";
+      var number = document.createElement("span");
+      number.className = "certificate-hub__card-index";
+      number.textContent = "MILESTONE " + String(index + 1).padStart(2, "0");
+      var seal = document.createElement("span");
+      seal.className = "certificate-hub__card-seal";
+      seal.setAttribute("aria-hidden", "true");
+      seal.textContent = "AM";
+      top.append(number, seal);
       var title = document.createElement("h2");
-      title.textContent = certificate.course_name + " — " + AMML.levelName(certificate.level_id);
+      title.textContent = certificate.course_name;
+      var level = document.createElement("p");
+      level.className = "certificate-hub__card-level";
+      level.textContent = AMML.levelName(certificate.level_id);
+      var meta = document.createElement("div");
+      meta.className = "certificate-hub__card-meta";
       var details = document.createElement("p");
-      details.textContent = "Issued " + new Date(certificate.issued_at).toLocaleDateString() + " · " + certificate.certificate_number;
+      details.textContent = "Issued " + new Date(certificate.issued_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      var serial = document.createElement("span");
+      serial.textContent = certificate.certificate_number;
+      meta.append(details, serial);
       var link = document.createElement("a");
-      link.className = "portal-link";
+      link.className = "certificate-hub__view";
       link.href = "certificate.html?id=" + encodeURIComponent(certificate.id);
-      link.textContent = "View and print certificate";
-      item.append(title, details, link);
+      link.append(document.createTextNode("View certificate "));
+      var arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↗";
+      link.appendChild(arrow);
+      item.append(top, title, level, meta, link);
       list.appendChild(item);
     });
     document.getElementById("certificate-content").hidden = false;

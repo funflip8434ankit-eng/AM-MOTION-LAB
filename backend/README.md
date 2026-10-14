@@ -26,6 +26,7 @@ Course progress and certificates:
 - `POST /api/learning/courses/:courseId/lessons/:lessonId/complete` records a completed lesson and issues a certificate when every lesson in that level is complete.
 - `GET /api/learning/certificates` and `GET /api/learning/certificates/:id` list and retrieve the logged-in student's certificates.
 - Progress tables are created from `course-schema.sql` when the server starts. Editable starter curricula for the five catalog courses are in `curriculum.js`.
+- API requests are limited to 300 per IP per 15 minutes. Login/register remain limited to 20 attempts, and checkout order creation/payment verification share a 20-request limit per IP per 15 minutes.
 
 Students mark each lesson complete after finishing it. Progress is tied to their account and requires paid course access; certificate issuance is saved once per course level.
 
@@ -34,4 +35,4 @@ Prices exist in `server.js` (authoritative) and `script.js` (display). Change bo
 ## Still to add before going live
 1. Fulfilment at the `TODO` in `server.js` (save enrolment / email student).
 2. A Razorpay webhook for `payment.captured` / `order.paid`.
-3. Rate-limiting and HTTPS on the hosting side.
+3. Confirm HTTPS and production proxy settings on the hosting side.

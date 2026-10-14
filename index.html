@@ -97,12 +97,21 @@
     </div>
 
     <div class="hero__media" data-reveal>
-      <div class="media-frame media-frame--16-9">
-        <div class="media-frame__inner">
-          <svg class="media-frame__icon" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
-          <p class="media-frame__label">Showreel / Course Preview</p>
-          <p class="media-frame__hint">Add video or motion graphic here — 16:9</p>
-        </div>
+      <div class="hero__visual" aria-label="Creative work in video editing, motion graphics and animation">
+        <div class="hero__visual-orbit hero__visual-orbit--one" aria-hidden="true"></div>
+        <div class="hero__visual-orbit hero__visual-orbit--two" aria-hidden="true"></div>
+        <figure class="hero__visual-back" aria-hidden="true"><img src="design/video%20editing.png" alt=""></figure>
+        <figure class="hero__visual-main">
+          <img src="design/motion%20graphic.png" alt="A motion graphics creator working on a digital animation project">
+          <div class="hero__visual-shade"></div>
+          <figcaption class="hero__visual-caption">
+            <span class="hero__visual-kicker"><i></i> Learn by making</span>
+            <strong>Ideas in<br>motion.</strong>
+          <span class="hero__visual-tags">EDIT <b>&#183;</b> DESIGN <b>&#183;</b> ANIMATE</span>
+          </figcaption>
+        </figure>
+        <div class="hero__visual-note"><span class="hero__visual-note-icon">&#10022;</span><span><strong>Make something real</strong><small>Build skills through projects</small></span></div>
+        <div class="hero__visual-stamp" aria-hidden="true">AM<br><small>MOTION LAB</small></div>
       </div>
       <div class="hero__media-glass" aria-hidden="true"></div>
     </div>
@@ -118,15 +127,40 @@
   </div>
 </section>
 
-<section class="certificate-promo" aria-labelledby="certificate-promo-title">
-  <div class="certificate-promo__inner" data-reveal>
-    <div>
-      <p class="eyebrow">Student portal</p>
-      <h2 id="certificate-promo-title">Your certificates, all in one place.</h2>
-      <p>Sign in to view, download, and print certificates earned through your courses.</p>
-    </div>
-    <a href="student/certificate-center.html" class="btn btn--primary">Open Certificate Center</a>
+<section class="home-tracks" aria-labelledby="home-tracks-title">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Find your creative lane</p>
+    <h2 id="home-tracks-title">Make your next idea your best work.</h2>
+    <p class="section-head__sub">Explore hands-on learning across the creative tools and disciplines you care about.</p>
   </div>
+  <div class="home-tracks__grid" data-reveal>
+    <a class="home-track home-track--video" href="courses.html#courses">
+      <img src="design/video%20editing.png" alt="" loading="lazy">
+      <span class="home-track__shade"></span><span class="home-track__number">01 / EDIT</span>
+      <span class="home-track__title">Video editing</span><span class="home-track__arrow" aria-hidden="true">&#8599;</span>
+    </a>
+    <a class="home-track home-track--motion" href="courses.html#courses">
+      <img src="design/motion%20graphic.png" alt="" loading="lazy">
+      <span class="home-track__shade"></span><span class="home-track__number">02 / MOTION</span>
+      <span class="home-track__title">Motion graphics</span><span class="home-track__arrow" aria-hidden="true">&#8599;</span>
+    </a>
+    <a class="home-track home-track--graphic" href="courses.html#courses">
+      <img src="design/graphic%20design.png" alt="" loading="lazy">
+      <span class="home-track__shade"></span><span class="home-track__number">03 / DESIGN</span>
+      <span class="home-track__title">Graphic design</span><span class="home-track__arrow" aria-hidden="true">&#8599;</span>
+    </a>
+    <a class="home-track home-track--animation" href="courses.html#courses">
+      <img src="design/2d%20animation.png" alt="" loading="lazy">
+      <span class="home-track__shade"></span><span class="home-track__number">04 / FRAME BY FRAME</span>
+      <span class="home-track__title">2D animation</span><span class="home-track__arrow" aria-hidden="true">&#8599;</span>
+    </a>
+    <a class="home-track home-track--three-d" href="courses.html#courses">
+      <img src="design/3d%20animetion.png" alt="" loading="lazy">
+      <span class="home-track__shade"></span><span class="home-track__number">05 / 3D WORLD</span>
+      <span class="home-track__title">3D animation</span><span class="home-track__arrow" aria-hidden="true">&#8599;</span>
+    </a>
+  </div>
+  <div class="home-tracks__foot"><span>Pick a skill. Build a portfolio. Find your momentum.</span><a href="courses.html#courses">Explore all courses <span aria-hidden="true">&#8594;</span></a></div>
 </section>
 
 </main>
@@ -252,6 +286,7 @@
   </div>
 </footer>
 
+<script src="student_assets/student.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

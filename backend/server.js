@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const Razorpay = require("razorpay");
 const pool = require("./db");
 
@@ -55,6 +56,14 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "10kb" }));
+// Caps bursts across the API; login and checkout have stricter route limits too.
+app.use("/api", rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please wait a little and try again." },
+}));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api", require("./routes/payment")(razorpay, KEY_SECRET, PRICES));
 app.use("/api/learning", require("./routes/learning"));

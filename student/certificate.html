@@ -15,25 +15,34 @@
       <div class="certificate-sheet__content">
         <header class="certificate-sheet__header">
           <img src="../image_web/icon_logo.png" alt="" class="certificate-sheet__logo">
-          <p class="certificate-sheet__brand">AM Motion Lab</p>
+          <div class="certificate-sheet__brand-wrap">
+            <p class="certificate-sheet__brand">AM Motion Lab</p>
+            <p class="certificate-sheet__brand-sub">Student achievement</p>
+          </div>
         </header>
-        <h1>Course Completion Certificate</h1>
-        <p class="certificate-sheet__lead">This certifies that</p>
+        <p class="certificate-sheet__eyebrow">Certificate of completion</p>
+        <h1>Certificate <span>of Achievement</span></h1>
+        <p class="certificate-sheet__lead">Proudly presented to</p>
         <p class="certificate-sheet__name" id="student-name"></p>
-        <p class="certificate-sheet__lead">has successfully completed the course</p>
+        <p class="certificate-sheet__lead certificate-sheet__lead--small">for successfully completing the course</p>
         <p class="certificate-sheet__course" id="course-name"></p>
-        <p class="certificate-sheet__level" id="course-level"></p>
-        <div class="certificate-sheet__signature" aria-hidden="true"><span></span><small>AM Motion Lab · Authorized Signature</small></div>
-        <div class="certificate-sheet__meta">
-          <span>Issued<strong id="issued-date"></strong></span>
-          <span>Certificate ID<strong id="certificate-number"></strong></span>
-        </div>
+        <p class="certificate-sheet__level"><span>Learning track</span><strong id="course-level"></strong></p>
+        <footer class="certificate-sheet__footer">
+          <div class="certificate-sheet__meta">
+            <span>DATE OF ISSUE<strong id="issued-date"></strong></span>
+            <span>CERTIFICATE NUMBER<strong id="certificate-number"></strong></span>
+          </div>
+          <div class="certificate-sheet__signature">
+            <div class="certificate-sheet__seal" aria-hidden="true"><span>AM</span><small>AWARDED</small></div>
+            <div class="certificate-sheet__signoff"><span></span><small>AM Motion Lab</small></div>
+          </div>
+        </footer>
       </div>
     </article>
     <p class="sub" id="status" role="status">Loading certificate…</p>
     <div class="certificate-actions" id="actions" hidden>
       <button class="btn" type="button" id="print-certificate">Print / Save as PDF</button>
-      <a class="portal-link" href="certificate-center.html">Certificate center</a>
+      <a class="portal-link" href="certificate-center.html">Back to certificates</a>
     </div>
   </div>
 </main>
@@ -51,7 +60,7 @@
     document.getElementById("student-name").textContent = certificate.student_name;
     document.getElementById("course-name").textContent = certificate.course_name;
     document.getElementById("course-level").textContent = AMML.levelName(certificate.level_id);
-    document.getElementById("issued-date").textContent = new Date(certificate.issued_at).toLocaleDateString();
+    document.getElementById("issued-date").textContent = new Date(certificate.issued_at).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
     document.getElementById("certificate-number").textContent = certificate.certificate_number;
     document.getElementById("certificate").hidden = false;
     document.getElementById("actions").hidden = false;
