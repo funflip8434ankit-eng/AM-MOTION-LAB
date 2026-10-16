@@ -15,6 +15,7 @@ const pool = require("./db");
 
 const KEY_ID = process.env.RAZORPAY_KEY_ID;
 const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || "";
 const PORT = process.env.PORT || 3000;
 
 if (!KEY_ID || !KEY_SECRET || KEY_ID.startsWith("YOUR_") || KEY_SECRET.startsWith("YOUR_")) {
@@ -55,6 +56,65 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") return res.sendStatus(204); // browser's "permission check"
   next();
 });
+
+// Razorpay signs the exact raw request body. Keep this route ahead of express.json().
+const webhookLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.post("/api/webhooks/razorpay", webhookLimiter, express.raw({ type: "application/json", limit: "1mb" }), async (req, res) => {
+  if (!WEBHOOK_SECRET) return res.status(503).json({ error: "Payment webhook is not configured." });
+  const signature = req.get("x-razorpay-signature") || "";
+  if (!Buffer.isBuffer(req.body) || !signature) return res.status(400).json({ error: "Invalid webhook request." });
+
+  const expected = crypto.createHmac("sha256", WEBHOOK_SECRET).update(req.body).digest("hex");
+  const expectedBytes = Buffer.from(expected, "hex");
+  const receivedBytes = Buffer.from(signature, "hex");
+  if (expectedBytes.length !== receivedBytes.length || !crypto.timingSafeEqual(expectedBytes, receivedBytes)) {
+    return res.status(400).json({ error: "Invalid webhook signature." });
+  }
+
+  let event;
+  try {
+    event = JSON.parse(req.body.toString("utf8"));
+  } catch (err) {
+    return res.status(400).json({ error: "Invalid webhook payload." });
+  }
+  if (event.event !== "payment.captured") return res.json({ received: true });
+
+  try {
+    const payment = event.payload && event.payload.payment && event.payload.payment.entity;
+    if (!payment || payment.status !== "captured" || !payment.id || !payment.order_id) {
+      return res.status(400).json({ error: "Invalid captured payment event." });
+    }
+    const order = await razorpay.orders.fetch(payment.order_id);
+    const notes = order.notes || {};
+    const userId = Number(notes.userId);
+    const price = PRICES[notes.courseId] && PRICES[notes.courseId][notes.levelId];
+    if (
+      !Number.isInteger(userId) || userId < 1 || !price ||
+      order.amount !== price * 100 || payment.amount !== order.amount ||
+      payment.currency !== "INR" || payment.order_id !== order.id
+    ) {
+      console.error("payment webhook order mismatch:", payment.id);
+      return res.status(400).json({ error: "Payment does not match the course order." });
+    }
+
+    await pool.query(
+      `INSERT INTO enrollments (user_id, course_id, level_id, order_id, payment_id, payment_status)
+       VALUES ($1, $2, $3, $4, $5, 'paid')
+       ON CONFLICT (payment_id) DO NOTHING`,
+      [userId, notes.courseId, notes.levelId, order.id, payment.id]
+    );
+    res.json({ received: true });
+  } catch (err) {
+    console.error("payment webhook failed:", err && err.statusCode, err && err.message);
+    res.status(500).json({ error: "Could not process payment webhook." });
+  }
+});
+
 app.use(express.json({ limit: "10kb" }));
 // Caps bursts across the API; login and checkout have stricter route limits too.
 app.use("/api", rateLimit({
@@ -65,67 +125,21 @@ app.use("/api", rateLimit({
   message: { error: "Too many requests. Please wait a little and try again." },
 }));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api", require("./routes/google-email"));
+app.use("/api/study", require("./routes/study"));
 app.use("/api", require("./routes/payment")(razorpay, KEY_SECRET, PRICES));
 app.use("/api/learning", require("./routes/learning"));
-/* ---------- 1. Create order ---------- */
-app.post("/api/create-order", async (req, res) => {
+
+// Render can use this to check that both the API process and database are ready.
+app.get("/health", async (req, res) => {
   try {
-    const { courseId, levelId, student } = req.body || {};
-    const price = PRICES[courseId] && PRICES[courseId][levelId];
-    if (!price) return res.status(400).json({ error: "Invalid course or level." });
-
-    const name = String((student && student.name) || "").trim();
-    const email = String((student && student.email) || "").trim();
-    const phone = String((student && student.phone) || "").trim();
-    if (name.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^[6-9]\d{9}$/.test(phone)) {
-      return res.status(400).json({ error: "Invalid student details." });
-    }
-
-    const order = await razorpay.orders.create({
-      amount: price * 100, // paise
-      currency: "INR",
-      receipt: "amml_" + Date.now(),
-      notes: { courseId, levelId, studentName: name.slice(0, 100), studentEmail: email.slice(0, 100), studentPhone: phone },
-    });
-
-    res.json({ orderId: order.id, amount: order.amount, currency: order.currency });
+    await pool.query("SELECT 1");
+    res.json({ status: "ok", database: "ok" });
   } catch (err) {
-    console.error("create-order failed:", err && err.statusCode, err && err.error && err.error.description);
-    res.status(500).json({ error: "Could not create order." });
+    console.error("health check failed:", err && err.message);
+    res.status(503).json({ status: "error" });
   }
 });
-
-/* ---------- 2. Verify payment signature ---------- */
-app.post("/api/verify-payment", async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
-  if (![razorpay_order_id, razorpay_payment_id, razorpay_signature].every((v) => typeof v === "string" && v)) {
-    return res.status(400).json({ verified: false });
-  }
-
-  const expected = crypto
-    .createHmac("sha256", KEY_SECRET)
-    .update(razorpay_order_id + "|" + razorpay_payment_id)
-    .digest("hex");
-
-  const a = Buffer.from(expected);
-  const b = Buffer.from(razorpay_signature);
-  const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
-  if (!valid) return res.status(400).json({ verified: false });
-
-  // ---- TODO (fulfilment): the payment is genuine from this point. ----
-  // Fetch the order to read the course/student saved in `notes`, then
-  // record the enrolment (database / Google Sheet) and/or email the student.
-  //   const order = await razorpay.orders.fetch(razorpay_order_id);
-  //   saveEnrolment({ ...order.notes, paymentId: razorpay_payment_id });
-  console.log("Payment verified:", razorpay_payment_id, "for order", razorpay_order_id);
-
-  res.json({ verified: true });
-});
-
-/* ---------- 3. (Recommended) Webhook ----------
-   Configure a webhook in the Razorpay Dashboard for `payment.captured` /
-   `order.paid` and verify it with X-Razorpay-Signature + a webhook secret.
-   This confirms enrolments even if the student closes the tab after paying. */
 
 /* ---------- Serve the static website from the parent folder ----------
    The backend folder itself is blocked so .env can never be downloaded. */
@@ -133,7 +147,7 @@ app.use("/backend", (req, res) => res.status(404).end());
 app.use(express.static(path.join(__dirname, ".."), { dotfiles: "deny" }));
 
 pool.query(fs.readFileSync(path.join(__dirname, "course-schema.sql"), "utf8"))
-  .then(() => app.listen(PORT, () => console.log("AM Motion Lab running at http://localhost:" + PORT)))
+  .then(() => app.listen(PORT, "0.0.0.0", () => console.log("AM Motion Lab listening on port " + PORT)))
   .catch((err) => {
     console.error("Could not prepare course progress tables:", err && err.message);
     process.exit(1);

@@ -1,47 +1,96 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log in — AM Motion Lab</title>
+<title>Log in â€” AM Motion Lab</title>
 <link rel="icon" href="../image_web/icon_logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../student_assets/student.css">
+<link rel="stylesheet" href="../student_assets/study-chat.css">
 </head>
 <body>
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="../index.html" class="nav__logo" aria-label="AM Motion Lab home"><img src="../image_web/full-logo.png" alt="AM Motion Lab" class="nav__logo-full"><img src="../image_web/icon_logo.png" alt="AM Motion Lab" class="nav__logo-icon"></a>
+    <nav class="nav__links" aria-label="Primary"><a href="../index.html">Home</a><a href="../learn.html">Learn</a><a href="../courses.html">Courses</a><a href="certificate-center.html" data-nav-certificates>Certificates</a><a href="../projects.html">Projects</a><a href="../about.html">About</a><a href="../faq.html">FAQ</a><a href="../contact.html">Contact</a></nav>
+    <a href="../contact.html" class="btn btn--primary nav__cta">Start Learning</a>
+    <button class="nav__burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu"><a href="../index.html">Home</a><a href="../learn.html">Learn</a><a href="../courses.html">Courses</a><a href="certificate-center.html" data-nav-certificates>Certificates</a><a href="../projects.html">Projects</a><a href="../about.html">About</a><a href="../faq.html">FAQ</a><a href="../contact.html">Contact</a><a href="../contact.html" class="btn btn--primary">Start Learning</a></div>
+</header>
 <main class="auth">
   <div class="auth__card">
     <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
     <h1>Welcome back</h1>
     <p class="sub">Log in to continue learning.</p>
     <form id="f" novalidate>
-      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
-      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
-      <button class="btn" id="btn" type="submit">Log in</button>
+      <div id="credentialsStep">
+        <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+        <button class="btn" id="btn" type="submit">Log in</button>
+      </div>
+      <div id="otpStep" hidden>
+        <div class="field"><label for="otpCode">Email verification code</label><input id="otpCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code"></div>
+        <button class="btn" id="verifyOtp" type="submit">Verify and continue</button>
+        <button class="btn btn--secondary" id="resendOtp" type="button">Resend code</button>
+      </div>
       <p class="msg" id="msg" role="status"></p>
     </form>
+    <div class="google-auth">
+      <div id="googleSignInButton" class="google-auth__button"></div>
+      <div class="google-auth__divider">or continue with Google</div>
+      <p class="google-auth__message" id="googleAuthMessage" role="status"></p>
+    </div>
     <p class="alt">New here? <a id="alt" href="register.html">Create an account</a></p>
   </div>
 </main>
 <script src="../student_assets/student.js"></script>
+<script src="../script.js"></script>
+<script src="../student_assets/google-auth.js" defer></script>
 <script>
 (function () {
   var form = document.getElementById("f"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
+  var credentialsStep = document.getElementById("credentialsStep"), otpStep = document.getElementById("otpStep");
+  var verifyOtp = document.getElementById("verifyOtp"), resendOtp = document.getElementById("resendOtp");
+  var otpMode = false, otpEmail = "";
   document.getElementById("alt").href = "register.html" + location.search;
   var next = new URLSearchParams(location.search).get("next");
+  if (next === "certificates") document.querySelectorAll("[data-nav-certificates]").forEach(function (link) { link.setAttribute("aria-current", "page"); });
   var dest = next === "courses" ? "../courses.html" : next === "certificates" ? "certificate-center.html" : "dashboard.html";
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    msg.className = "msg"; msg.textContent = "Logging in… (the first time can take up to a minute)"; btn.disabled = true;
+    msg.className = "msg";
+    if (otpMode) {
+      msg.textContent = "Verifying code..."; verifyOtp.disabled = true;
+      try {
+        var verified = await AMML.api("/api/auth/login/verify-otp", { method: "POST", body: { email: otpEmail, code: form.code.value.trim() } });
+        AMML.setToken(verified.token);
+        location.href = dest;
+      } catch (err) { msg.className = "msg err"; msg.textContent = err.message; verifyOtp.disabled = false; }
+      return;
+    }
+    msg.textContent = "Checking your details and sending a sign-in code..."; btn.disabled = true;
     try {
       var d = await AMML.api("/api/auth/login", { method: "POST", body: { email: form.email.value, password: form.password.value } });
-      AMML.setToken(d.token);
-      location.href = dest;
-    } catch (err) {
-      msg.className = "msg err"; msg.textContent = err.message; btn.disabled = false;
-    }
+      otpEmail = d.email; otpMode = true; credentialsStep.hidden = true; otpStep.hidden = false;
+      msg.textContent = "We sent a 6-digit code to " + otpEmail + ". It expires in 10 minutes.";
+      form.code.focus();
+    } catch (err) { msg.className = "msg err"; msg.textContent = err.message; btn.disabled = false; }
+  });
+  resendOtp.addEventListener("click", async function () {
+    resendOtp.disabled = true; msg.className = "msg"; msg.textContent = "Requesting a new code...";
+    try {
+      var result = await AMML.api("/api/auth/login/resend-otp", { method: "POST", body: { email: otpEmail, password: form.password.value } });
+      msg.textContent = result.message;
+    } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    finally { resendOtp.disabled = false; }
   });
 })();
 </script>
+<script src="../student_assets/study-chat.js"></script>
 </body>
 </html>

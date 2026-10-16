@@ -1,7 +1,7 @@
 /* =========================================================
    AM MOTION LAB — script.js
    Learn • Create • Earn
-   Vanilla JS. No dependencies except optional EmailJS (CDN).
+   Vanilla JS with backend email delivery.
    ========================================================= */
 
 (function () {
@@ -10,25 +10,6 @@
   /* =========================================================
      1. CONFIG
      ========================================================= */
-  const EMAILJS_CONFIG = {
-    serviceId: "YOUR_SERVICE_ID",
-    templateId: "YOUR_TEMPLATE_ID",
-    publicKey: "YOUR_PUBLIC_KEY",
-  };
-
-  // EmailJS is only considered "configured" once the placeholders above
-  // have been replaced with real values.
-  function isEmailJsConfigured() {
-    return (
-      EMAILJS_CONFIG.serviceId &&
-      EMAILJS_CONFIG.templateId &&
-      EMAILJS_CONFIG.publicKey &&
-      !EMAILJS_CONFIG.serviceId.startsWith("YOUR_") &&
-      !EMAILJS_CONFIG.templateId.startsWith("YOUR_") &&
-      !EMAILJS_CONFIG.publicKey.startsWith("YOUR_")
-    );
-  }
-
   const MAX_FILE_SIZE_MB = 20;
   const ALLOWED_FILE_TYPES = [".pdf", ".jpg", ".jpeg", ".png", ".mp4"];
 
@@ -168,6 +149,84 @@
       }
     });
   }
+
+  /* Desktop-only, pointer-driven depth. Touch devices keep the light static composition. */
+  (function initHeroDepth() {
+    const visual = document.querySelector(".hero__visual");
+    const desktopPointer = window.matchMedia && window.matchMedia("(min-width: 861px) and (hover: hover) and (pointer: fine)").matches;
+    if (!visual || !desktopPointer || prefersReducedMotion) return;
+
+    let frame = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    function paintDepth() {
+      frame = 0;
+      visual.style.setProperty("--tilt-x", (pointerX * 8).toFixed(2) + "deg");
+      visual.style.setProperty("--tilt-y", (pointerY * -7).toFixed(2) + "deg");
+      visual.style.setProperty("--main-shift-x", (pointerX * 5).toFixed(1) + "px");
+      visual.style.setProperty("--main-shift-y", (pointerY * 4).toFixed(1) + "px");
+      visual.style.setProperty("--back-shift-x", (pointerX * -10).toFixed(1) + "px");
+      visual.style.setProperty("--back-shift-y", (pointerY * -8).toFixed(1) + "px");
+      visual.style.setProperty("--note-shift-x", (pointerX * 7).toFixed(1) + "px");
+      visual.style.setProperty("--note-shift-y", (pointerY * 6).toFixed(1) + "px");
+      visual.style.setProperty("--stamp-shift-x", (pointerX * 4).toFixed(1) + "px");
+      visual.style.setProperty("--stamp-shift-y", (pointerY * 5).toFixed(1) + "px");
+    }
+    visual.addEventListener("pointermove", function (event) {
+      const bounds = visual.getBoundingClientRect();
+      pointerX = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
+      pointerY = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
+      visual.classList.add("is-3d");
+      if (!frame) frame = window.requestAnimationFrame(paintDepth);
+    }, { passive: true });
+    visual.addEventListener("pointerleave", function () {
+      visual.classList.remove("is-3d");
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = 0;
+      pointerX = 0;
+      pointerY = 0;
+      ["--tilt-x", "--tilt-y", "--main-shift-x", "--main-shift-y", "--back-shift-x", "--back-shift-y", "--note-shift-x", "--note-shift-y", "--stamp-shift-x", "--stamp-shift-y"].forEach(function (property) {
+        visual.style.removeProperty(property);
+      });
+    });
+  })();
+
+  /* Add pointer-following 3D tilt to course cards on desktop, without a rendering library. */
+  (function initCourseCardDepth() {
+    const cards = document.querySelectorAll(".course-card");
+    const desktopPointer = window.matchMedia && window.matchMedia("(min-width: 861px) and (hover: hover) and (pointer: fine)").matches;
+    if (!cards.length || !desktopPointer || prefersReducedMotion) return;
+
+    cards.forEach(function (card) {
+      let frame = 0;
+      let pointerX = 0;
+      let pointerY = 0;
+      function paintDepth() {
+        frame = 0;
+        card.style.setProperty("--card-tilt-x", (pointerX * 5).toFixed(2) + "deg");
+        card.style.setProperty("--card-tilt-y", (pointerY * -4).toFixed(2) + "deg");
+        card.style.setProperty("--card-shift-x", (pointerX * -5).toFixed(1) + "px");
+        card.style.setProperty("--card-shift-y", (pointerY * -4).toFixed(1) + "px");
+      }
+      card.addEventListener("pointermove", function (event) {
+        const bounds = card.getBoundingClientRect();
+        pointerX = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - .5) * 2));
+        pointerY = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - .5) * 2));
+        card.classList.add("is-3d");
+        if (!frame) frame = window.requestAnimationFrame(paintDepth);
+      }, { passive: true });
+      card.addEventListener("pointerleave", function () {
+        card.classList.remove("is-3d");
+        if (frame) window.cancelAnimationFrame(frame);
+        frame = 0;
+        pointerX = 0;
+        pointerY = 0;
+        ["--card-tilt-x", "--card-tilt-y", "--card-shift-x", "--card-shift-y"].forEach(function (property) {
+          card.style.removeProperty(property);
+        });
+      });
+    });
+  })();
 
   /* =========================================================
      5. SCROLL REVEALS
@@ -587,7 +646,7 @@
   }
 
   /* =========================================================
-     10. ENQUIRY FORM / EMAILJS
+     10. ENQUIRY FORM / BACKEND EMAIL
      ========================================================= */
   const requiredFields = ["fullName", "email", "phone", "interest", "experience", "message"];
 
@@ -690,7 +749,7 @@
       });
     });
 
-    enquiryForm.addEventListener("submit", function (e) {
+    enquiryForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       if (!validateForm()) {
@@ -713,41 +772,36 @@
         fileName: selectedFile ? selectedFile.name : "",
       };
 
-      if (!isEmailJsConfigured()) {
-        // Be honest: the form works, but delivery isn't wired up yet.
-        setSubmitting(false);
-        setStatus(
-          "Your enquiry form is ready, but email delivery has not been configured yet.",
-          "is-error"
-        );
-        return;
-      }
-
-      if (typeof window.emailjs === "undefined") {
-        setSubmitting(false);
-        setStatus(
-          "Email service failed to load. Please contact us directly using the details on this page.",
-          "is-error"
-        );
-        return;
-      }
-
-      window.emailjs
-        .send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, formData, EMAILJS_CONFIG.publicKey)
-        .then(function () {
-          setSubmitting(false);
-          setStatus("Thank you — your enquiry has been sent successfully.", "is-success");
-          enquiryForm.reset();
-          resetFileState();
-          requiredFields.forEach((name) => setFieldError(name, ""));
-        })
-        .catch(function () {
-          setSubmitting(false);
-          setStatus(
-            "Something went wrong while sending your enquiry. Please try again or contact us directly.",
-            "is-error"
-          );
+      try {
+        const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        const apiBase = isLocal ? "http://localhost:3000" : "https://am-motion-lab.onrender.com";
+        const response = await fetch(apiBase + "/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
         });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || "Could not send your question right now. Please try again.");
+        }
+        setSubmitting(false);
+        setStatus(
+          result.confirmationSent === false
+            ? "Your enquiry was sent. We could not send the confirmation email, so please check your email address."
+            : result.aiAnswered
+              ? result.aiSource === "course-faq"
+                ? "Your enquiry was sent. A quick study FAQ reply and confirmation email are on their way."
+                : "Your enquiry was sent. An AI study reply and confirmation email are on their way."
+              : "Thank you — your enquiry has been sent successfully. A confirmation email is on its way.",
+          "is-success"
+        );
+        enquiryForm.reset();
+        resetFileState();
+        requiredFields.forEach((name) => setFieldError(name, ""));
+      } catch (err) {
+        setSubmitting(false);
+        setStatus(err.message || "Something went wrong while sending your enquiry. Please try again or contact us directly.", "is-error");
+      }
     });
   }
 

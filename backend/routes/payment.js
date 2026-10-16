@@ -83,7 +83,8 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
       ]);
       const n = order.notes || {};
       const price = PRICES[n.courseId] && PRICES[n.courseId][n.levelId];
-      const statusOk = payment.status === "captured" || payment.status === "authorized";
+      // Never grant course access for an authorization that has not been captured.
+      const statusOk = payment.status === "captured";
 
       if (
         !price ||

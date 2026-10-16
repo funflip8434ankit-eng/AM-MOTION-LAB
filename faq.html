@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="student_assets/study-chat.css">
 </head>
 <body>
 
@@ -140,10 +141,95 @@
         <span class="accordion__icon"></span>
       </button>
       <div class="accordion__panel">
-        <p>Use the enquiry form below, or reach out directly by email, phone, Instagram or YouTube.</p>
+        <p>Send your question using the <a href="#faq-enquiry">FAQ enquiry form below</a>. For course enrolment, use the Contact page.</p>
       </div>
     </div>
 
+  </div>
+</section>
+
+<!-- ================= FAQ ENQUIRY ================= -->
+<section class="contact faq-enquiry" id="faq-enquiry">
+  <div class="section-head" data-reveal>
+    <p class="eyebrow">Ask a question</p>
+    <h2>Need help with a study question?</h2>
+    <p class="section-head__sub">Send your question here. We’ll email you a reply, and eligible course questions may also get an automatic draft answer.</p>
+  </div>
+
+  <div class="contact__inner" data-reveal>
+    <form class="enquiry" id="enquiryForm" novalidate>
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required autocomplete="name">
+          <span class="field__error" data-error-for="fullName"></span>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+          <span class="field__error" data-error-for="email"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel">
+          <span class="field__error" data-error-for="phone"></span>
+        </div>
+        <div class="field">
+          <label for="interest">Interested In</label>
+          <select id="interest" name="interest" required>
+            <option value="" disabled selected>Select an area</option>
+            <option>Video Editing</option>
+            <option>Motion Graphics</option>
+            <option>2D Animation</option>
+            <option>3D Animation</option>
+            <option>Graphic Design</option>
+            <option>Other</option>
+          </select>
+          <span class="field__error" data-error-for="interest"></span>
+        </div>
+      </div>
+
+      <div class="enquiry__row">
+        <div class="field">
+          <label for="experience">Experience Level</label>
+          <select id="experience" name="experience" required>
+            <option value="" disabled selected>Select your level</option>
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+          <span class="field__error" data-error-for="experience"></span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="message">Your question</label>
+        <textarea id="message" name="message" rows="4" required placeholder="Type your study question"></textarea>
+        <span class="field__error" data-error-for="message"></span>
+      </div>
+
+      <div class="field">
+        <label>Reference file (optional)</label>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a file: PDF, JPG, PNG or MP4, up to 20 megabytes">
+          <input type="file" id="fileInput" name="file" accept=".pdf,.jpg,.jpeg,.png,.mp4" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <p><strong>Choose a reference file</strong></p>
+          <p class="dropzone__hint">PDF, JPG, PNG or MP4 — up to 20MB. The email includes the filename only; paste a share link in your message to send the file.</p>
+        </div>
+        <div class="dropzone__file" id="fileChosen" hidden>
+          <span id="fileName"></span>
+          <button type="button" id="fileRemove" aria-label="Remove selected file">&times;</button>
+        </div>
+        <span class="field__error" data-error-for="file"></span>
+      </div>
+
+      <button type="submit" class="btn btn--primary enquiry__submit"><span>Send question</span></button>
+      <p class="enquiry__ai-note">Study questions may be processed by Google Gemini to draft an automatic reply. Do not include passwords, payment details, or other sensitive information.</p>
+      <div class="enquiry__status" id="enquiryStatus" role="status" aria-live="polite"></div>
+    </form>
   </div>
 </section>
 
@@ -192,5 +278,7 @@
 </footer>
 
 <script src="script.js"></script>
+<script src="student_assets/student.js"></script>
+<script src="student_assets/study-chat.js"></script>
 </body>
 </html>

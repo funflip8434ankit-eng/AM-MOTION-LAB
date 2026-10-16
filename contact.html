@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="student_assets/study-chat.css">
 </head>
 <body>
 
@@ -153,12 +154,12 @@
       </div>
 
       <div class="field">
-        <label>Upload your work / reference</label>
+        <label>Choose a reference file (optional)</label>
         <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload a file: PDF, JPG, PNG or MP4, up to 20 megabytes">
           <input type="file" id="fileInput" name="file" accept=".pdf,.jpg,.jpeg,.png,.mp4" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-          <p><strong>Upload your work / reference</strong></p>
-          <p class="dropzone__hint">PDF, JPG, PNG or MP4 — click or drag a file here, up to 20MB</p>
+          <p><strong>Choose a reference file</strong></p>
+          <p class="dropzone__hint">PDF, JPG, PNG or MP4 — up to 20MB. The email includes the filename only; paste a share link in your message to send the file.</p>
         </div>
         <div class="dropzone__file" id="fileChosen" hidden>
           <span id="fileName"></span>
@@ -170,6 +171,7 @@
       <button type="submit" class="btn btn--primary enquiry__submit">
         <span>Submit Enquiry</span>
       </button>
+      <p class="enquiry__ai-note">Study questions may be processed by Google Gemini to draft an automatic reply. Please do not include passwords, payment details, or other sensitive information.</p>
 
       <div class="enquiry__status" id="enquiryStatus" role="status" aria-live="polite"></div>
     </form>
@@ -221,7 +223,8 @@
   </div>
 </footer>
 
+<script src="student_assets/student.js"></script>
 <script src="script.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="student_assets/study-chat.js"></script>
 </body>
 </html>

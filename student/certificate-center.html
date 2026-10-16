@@ -5,14 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Certificate Center — AM Motion Lab</title>
 <link rel="icon" href="../image_web/icon_logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&family=Staatliches&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="../student_assets/student.css">
+<link rel="stylesheet" href="../student_assets/study-chat.css">
 </head>
 <body class="certificate-center-page">
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="../index.html" class="nav__logo" aria-label="AM Motion Lab home">
+      <img src="../image_web/full-logo.png" alt="AM Motion Lab" class="nav__logo-full">
+      <img src="../image_web/icon_logo.png" alt="AM Motion Lab" class="nav__logo-icon">
+    </a>
+    <nav class="nav__links" aria-label="Primary">
+      <a href="../index.html">Home</a><a href="../learn.html">Learn</a><a href="../courses.html">Courses</a>
+      <a href="certificate-center.html" aria-current="page">Certificates</a><a href="../projects.html">Projects</a>
+      <a href="../about.html">About</a><a href="../faq.html">FAQ</a><a href="../contact.html">Contact</a>
+    </nav>
+    <a href="../contact.html" class="btn btn--primary nav__cta">Start Learning</a>
+    <button class="nav__burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../index.html">Home</a><a href="../learn.html">Learn</a><a href="../courses.html">Courses</a>
+    <a href="certificate-center.html" aria-current="page">Certificates</a><a href="../projects.html">Projects</a>
+    <a href="../about.html">About</a><a href="../faq.html">FAQ</a><a href="../contact.html">Contact</a>
+    <a href="../contact.html" class="btn btn--primary">Start Learning</a>
+  </div>
+</header>
 <main class="certificate-hub">
   <div class="certificate-hub__wrap">
     <header class="certificate-hub__topbar">
-      <a class="auth__brand" href="../index.html"><img src="../image_web/icon_logo.png" alt=""><span>AM Motion Lab</span></a>
       <div class="certificate-hub__actions">
         <a href="dashboard.html" class="certificate-hub__back">← Dashboard</a>
         <button class="certificate-hub__logout" id="logout" type="button">Log out</button>
@@ -52,6 +76,7 @@
   </div>
 </main>
 <script src="../student_assets/student.js"></script>
+<script src="../script.js"></script>
 <script>
 (async function () {
   if (!AMML.getToken()) { location.replace("login.html?next=certificates"); return; }
@@ -117,5 +142,6 @@
   }
 })();
 </script>
+<script src="../student_assets/study-chat.js"></script>
 </body>
 </html>
