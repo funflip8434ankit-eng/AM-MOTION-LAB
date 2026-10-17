@@ -774,7 +774,7 @@
 
       try {
         const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-        const apiBase = isLocal ? "http://localhost:3000" : "https://am-motion-lab.onrender.com";
+        const apiBase = isLocal ? "http://localhost:3000" : "https://am-motion-lab-9ui2.onrender.com";
         const response = await fetch(apiBase + "/api/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -838,7 +838,7 @@
      The secret lives in backend/.env (see backend/README.md).
      --------------------------------------------------------- */
        const IS_LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  const API_BASE = IS_LOCAL ? "http://localhost:3000" : "https://am-motion-lab.onrender.com";
+  const API_BASE = IS_LOCAL ? "http://localhost:3000" : "https://am-motion-lab-9ui2.onrender.com";
   function getStudentToken() {
     try { return localStorage.getItem("amml_token") || ""; } catch (e) { return ""; }
   }

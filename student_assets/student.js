@@ -4,7 +4,7 @@
   // Where the backend lives: local server while testing, Render when the site is online.
   var API_BASE = isLocal
     ? (location.port === "3000" ? "" : "http://localhost:3000")
-    : "https://am-motion-lab.onrender.com";
+    : "https://am-motion-lab-9ui2.onrender.com";
   var TOKEN_KEY = "amml_token";
 
   var COURSES = {
