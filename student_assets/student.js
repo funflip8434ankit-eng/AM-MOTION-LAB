@@ -75,13 +75,11 @@
 
   (function initAuthNavigation() {
     var path = location.pathname;
-    if (/\/student\/(login|register)\.html$/i.test(path)) return;
     var desktopNav = document.querySelector(".nav__links");
     var mobileMenu = document.getElementById("mobileMenu");
     if (!desktopNav && !mobileMenu) return;
     var inStudentFolder = /\/student\//i.test(path);
     var loginHref = (inStudentFolder ? "" : "student/") + "login.html";
-    var dashboardHref = (inStudentFolder ? "" : "student/") + "dashboard.html";
 
     function hasSession() {
       var token = getToken();
@@ -97,12 +95,13 @@
       if (!container) return;
       container.querySelectorAll(".nav-auth-control").forEach(function (node) { node.remove(); });
       var loggedIn = hasSession();
-      var loginLink = document.createElement("a");
-      loginLink.className = "nav-auth-control";
-      loginLink.href = loggedIn ? dashboardHref : loginHref;
-      loginLink.textContent = loggedIn ? "Dashboard" : "Log in";
-      container.appendChild(loginLink);
-      if (loggedIn) {
+      if (!loggedIn) {
+        var loginLink = document.createElement("a");
+        loginLink.className = "nav-auth-control";
+        loginLink.href = loginHref;
+        loginLink.textContent = "Log in";
+        container.appendChild(loginLink);
+      } else {
         var logout = document.createElement("button");
         logout.type = "button";
         logout.className = "nav-auth-control nav-auth-logout";

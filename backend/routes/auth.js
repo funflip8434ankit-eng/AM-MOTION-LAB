@@ -6,7 +6,9 @@ const rateLimit = require("express-rate-limit");
 const { verifyGoogleIdToken } = require("../google-verify");
 const pool = require("../db");
 const requireAuth = require("../middleware/requireAuth");
-const sendLoginOtp = require("./google-email").sendLoginOtp;
+const emailSender = require("./google-email");
+const sendLoginOtp = emailSender.sendLoginOtp;
+const sendPasswordResetOtp = emailSender.sendPasswordResetOtp;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -225,6 +227,85 @@ router.post("/login/resend-otp", limiter, async (req, res) => {
     console.error("login OTP resend failed:", err && err.message);
     return res.status(503).json({ error: "Could not resend the code. Please try again in a moment." });
   }
+});
+
+/* ---------- Password reset by email code ---------- */
+router.post("/password/forgot", limiter, async (req, res) => {
+  const generic = { sent: true, message: "If an account exists for that email, a reset code has been sent." };
+  try {
+    const email = String((req.body && req.body.email) || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Please enter a valid email." });
+    const result = await pool.query("SELECT id, name, email, password_hash FROM users WHERE LOWER(email) = $1", [email]);
+    const user = result.rows[0];
+    if (!user || !user.password_hash) return res.json(generic);
+    const cooldown = await pool.query(
+      "SELECT sent_at > NOW() - INTERVAL '60 seconds' AS active FROM password_reset_otps WHERE user_id = $1", [user.id]
+    );
+    if (cooldown.rows[0] && cooldown.rows[0].active) return res.json(generic);
+    const code = String(crypto.randomInt(0, 1000000)).padStart(6, "0");
+    const codeHash = otpHash(user.id, code);
+    await pool.query(
+      `INSERT INTO password_reset_otps (user_id, code_hash, expires_at, sent_at, attempts)
+       VALUES ($1, $2, NOW() + INTERVAL '10 minutes', NOW(), 0)
+       ON CONFLICT (user_id) DO UPDATE SET code_hash = EXCLUDED.code_hash,
+         expires_at = EXCLUDED.expires_at, sent_at = EXCLUDED.sent_at, attempts = 0`,
+      [user.id, codeHash]
+    );
+    try { await sendPasswordResetOtp(user.email, user.name, code); }
+    catch (err) {
+      await pool.query("DELETE FROM password_reset_otps WHERE user_id = $1 AND code_hash = $2", [user.id, codeHash]);
+      throw err;
+    }
+    return res.json(generic);
+  } catch (err) {
+    console.error("password reset code send failed:", err && err.message);
+    return res.status(503).json({ error: "Could not send a reset code right now. Please try again." });
+  }
+});
+
+router.post("/password/reset", limiter, async (req, res) => {
+  const email = String((req.body && req.body.email) || "").trim().toLowerCase();
+  const code = String((req.body && req.body.code) || "").trim();
+  const password = String((req.body && req.body.password) || "");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) return res.status(400).json({ error: "Enter your email and the 6-digit reset code." });
+  if (password.length < 8 || password.length > 72) return res.status(400).json({ error: "Password must be 8 to 72 characters." });
+  let client;
+  try {
+    const result = await pool.query(
+      `SELECT u.id, o.code_hash, o.expires_at, o.attempts FROM users u
+       JOIN password_reset_otps o ON o.user_id = u.id WHERE LOWER(u.email) = $1`, [email]
+    );
+    const row = result.rows[0];
+    if (!row || row.attempts >= 5 || new Date(row.expires_at).getTime() <= Date.now()) {
+      if (row) await pool.query("DELETE FROM password_reset_otps WHERE user_id = $1", [row.id]);
+      return res.status(401).json({ error: "That code is invalid or expired. Request a new one." });
+    }
+    const expected = Buffer.from(row.code_hash, "hex");
+    const actual = Buffer.from(otpHash(row.id, code), "hex");
+    if (expected.length !== actual.length || !crypto.timingSafeEqual(expected, actual)) {
+      await pool.query("UPDATE password_reset_otps SET attempts = attempts + 1 WHERE user_id = $1", [row.id]);
+      return res.status(401).json({ error: "That code is incorrect. Check the email and try again." });
+    }
+    const passwordHash = await bcrypt.hash(password, 12);
+    client = await pool.connect();
+    await client.query("BEGIN");
+    const consumed = await client.query(
+      "DELETE FROM password_reset_otps WHERE user_id = $1 AND code_hash = $2 AND expires_at > NOW() AND attempts < 5 RETURNING user_id",
+      [row.id, row.code_hash]
+    );
+    if (!consumed.rowCount) {
+      await client.query("ROLLBACK");
+      return res.status(401).json({ error: "That code is invalid or expired. Request a new one." });
+    }
+    await client.query("UPDATE users SET password_hash = $1 WHERE id = $2", [passwordHash, row.id]);
+    await client.query("DELETE FROM login_otps WHERE user_id = $1", [row.id]);
+    await client.query("COMMIT");
+    return res.json({ reset: true, message: "Password updated. You can now log in." });
+  } catch (err) {
+    if (client) await client.query("ROLLBACK").catch(() => {});
+    console.error("password reset failed:", err && err.message);
+    return res.status(500).json({ error: "Could not reset your password. Please try again." });
+  } finally { if (client) client.release(); }
 });
 
 /* ---------- Who am I (account + purchased courses) ---------- */

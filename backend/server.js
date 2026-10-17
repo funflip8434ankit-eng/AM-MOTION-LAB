@@ -91,8 +91,8 @@ app.post("/api/webhooks/razorpay", webhookLimiter, express.raw({ type: "applicat
     }
     const order = await razorpay.orders.fetch(payment.order_id);
     const notes = order.notes || {};
-    const userId = Number(notes.userId);
     const price = PRICES[notes.courseId] && PRICES[notes.courseId][notes.levelId];
+    const userId = Number(notes.userId);
     if (
       !Number.isInteger(userId) || userId < 1 || !price ||
       order.amount !== price * 100 || payment.amount !== order.amount ||

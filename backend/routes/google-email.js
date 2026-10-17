@@ -88,12 +88,15 @@ async function sendGmailMessage(accessToken, to, subject, messageText, replyTo) 
 async function sendLoginOtp(to, name, code) {
   const accessToken = await getAccessToken();
   const greeting = String(name || "Student").replace(/[\r\n]/g, " ").slice(0, 100);
-  await sendGmailMessage(
-    accessToken,
-    to,
-    "Your AM Motion Lab sign-in code",
-    "Hi " + greeting + ",\n\nYour AM Motion Lab sign-in code is " + code + ". It expires in 10 minutes.\n\nIf you did not try to sign in, you can ignore this email. Do not share this code with anyone."
-  );
+  await sendGmailMessage(accessToken, to, "Your AM Motion Lab sign-in code",
+    "Hi " + greeting + ",\n\nYour AM Motion Lab sign-in code is " + code + ". It expires in 10 minutes.\n\nIf you did not try to sign in, you can ignore this email. Do not share this code with anyone.");
+}
+
+async function sendPasswordResetOtp(to, name, code) {
+  const accessToken = await getAccessToken();
+  const greeting = String(name || "Student").replace(/[\r\n]/g, " ").slice(0, 100);
+  await sendGmailMessage(accessToken, to, "Your AM Motion Lab password reset code",
+    "Hi " + greeting + ",\n\nYour password reset code is " + code + ". It expires in 10 minutes. If you did not request this, ignore this email.");
 }
 
 /* One-time Gmail owner authorization. This route only starts from the local machine. */
@@ -209,6 +212,11 @@ router.post("/contact", contactLimiter, async (req, res) => {
         "Hi " + fields.fullName + ",",
         "",
         "We received your enquiry about " + fields.interest + ".",
+        "",
+        "Your question:",
+        fields.message,
+        "",
+        "Our response:",
         aiAnswer
           ? (aiSource === "course-faq"
             ? "Here is a quick study answer from our course FAQ:\n\n" + aiAnswer + "\n\nIf you need more help, reply to this email and our team can help."
@@ -236,4 +244,5 @@ router.post("/contact", contactLimiter, async (req, res) => {
 });
 
 router.sendLoginOtp = sendLoginOtp;
+router.sendPasswordResetOtp = sendPasswordResetOtp;
 module.exports = router;

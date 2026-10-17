@@ -1504,7 +1504,7 @@
         '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
         '<button type="button" class="btn btn--ghost" id="coDone">Close</button>';
     const done = byId("coDone");
-    if (done) done.addEventListener("click", function () { if (success) { location.href = "student/dashboard.html"; } else { closeCheckout(); } });
+    if (done) done.addEventListener("click", closeCheckout);
     if (done) done.focus();
   }
 })();

@@ -12,7 +12,7 @@
 
   function destination() {
     var next = new URLSearchParams(location.search).get("next");
-    return next === "courses" ? "../courses.html" : next === "certificates" ? "certificate-center.html" : "dashboard.html";
+    return next === "certificates" ? "certificate-center.html" : "../courses.html";
   }
 
   function loadGoogleScript() {

@@ -32,6 +32,7 @@
         <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div>
         <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
         <button class="btn" id="btn" type="submit">Log in</button>
+        <button class="portal-link" id="forgotPassword" type="button">Forgot password?</button>
       </div>
       <div id="otpStep" hidden>
         <div class="field"><label for="otpCode">Email verification code</label><input id="otpCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code"></div>
@@ -40,6 +41,17 @@
       </div>
       <p class="msg" id="msg" role="status"></p>
     </form>
+    <section id="forgotStep" hidden>
+      <h2>Reset your password</h2>
+      <div class="field"><label for="resetEmail">Email</label><input id="resetEmail" type="email" autocomplete="email"></div>
+      <button class="btn btn--secondary" id="sendResetCode" type="button">Send reset code</button>
+      <div id="resetFields" hidden>
+        <div class="field"><label for="resetCode">6-digit code</label><input id="resetCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+        <div class="field"><label for="newPassword">New password</label><input id="newPassword" type="password" autocomplete="new-password"></div>
+        <button class="btn" id="savePassword" type="button">Update password</button>
+      </div>
+      <button class="portal-link" id="backToLogin" type="button">Back to login</button>
+    </section>
     <div class="google-auth">
       <div id="googleSignInButton" class="google-auth__button"></div>
       <div class="google-auth__divider">or continue with Google</div>
@@ -60,7 +72,36 @@
   document.getElementById("alt").href = "register.html" + location.search;
   var next = new URLSearchParams(location.search).get("next");
   if (next === "certificates") document.querySelectorAll("[data-nav-certificates]").forEach(function (link) { link.setAttribute("aria-current", "page"); });
-  var dest = next === "courses" ? "../courses.html" : next === "certificates" ? "certificate-center.html" : "dashboard.html";
+  var dest = next === "certificates" ? "certificate-center.html" : "../courses.html";
+  var forgotStep = document.getElementById("forgotStep"), resetFields = document.getElementById("resetFields");
+  document.getElementById("forgotPassword").addEventListener("click", function () {
+    credentialsStep.hidden = true; otpStep.hidden = true; forgotStep.hidden = false;
+    document.getElementById("resetEmail").value = form.email.value;
+    msg.textContent = "";
+  });
+  document.getElementById("backToLogin").addEventListener("click", function () {
+    forgotStep.hidden = true; credentialsStep.hidden = false; otpStep.hidden = otpMode; msg.textContent = "";
+  });
+  document.getElementById("sendResetCode").addEventListener("click", async function () {
+    var sendButton = this; sendButton.disabled = true; msg.className = "msg"; msg.textContent = "Sending reset code...";
+    try {
+      var result = await AMML.api("/api/auth/password/forgot", { method: "POST", body: { email: document.getElementById("resetEmail").value } });
+      resetFields.hidden = false; msg.textContent = result.message; document.getElementById("resetCode").focus();
+    } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    finally { sendButton.disabled = false; }
+  });
+  document.getElementById("savePassword").addEventListener("click", async function () {
+    var saveButton = this; saveButton.disabled = true; msg.className = "msg"; msg.textContent = "Updating password...";
+    try {
+      var result = await AMML.api("/api/auth/password/reset", { method: "POST", body: {
+        email: document.getElementById("resetEmail").value,
+        code: document.getElementById("resetCode").value,
+        password: document.getElementById("newPassword").value
+      }});
+      forgotStep.hidden = true; credentialsStep.hidden = false; msg.textContent = result.message;
+    } catch (err) { msg.className = "msg err"; msg.textContent = err.message; }
+    finally { saveButton.disabled = false; }
+  });
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
     msg.className = "msg";

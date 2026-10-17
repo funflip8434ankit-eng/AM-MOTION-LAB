@@ -27,7 +27,7 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
       const user = u.rows[0];
       if (!user) return res.status(401).json({ error: "Please log in again." });
 
-      // Already owns this level (or a higher one)? Don't charge twice.
+      // Prevent duplicate purchases for the same email at the same or higher level.
       const owned = await pool.query(
         "SELECT level_id FROM enrollments WHERE user_id = $1 AND course_id = $2 AND payment_status = 'paid'",
         [user.id, courseId]

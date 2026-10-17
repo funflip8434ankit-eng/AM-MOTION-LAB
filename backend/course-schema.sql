@@ -3,18 +3,25 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   email VARCHAR(150) NOT NULL,
-  phone VARCHAR(20) NOT NULL,
+  phone VARCHAR(20),
   password_hash TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Google-only accounts don't have a phone number at sign-up.
+-- Google sign-in users may not have a phone number.
 ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_unique ON users (LOWER(email));
 
--- Short-lived email codes used to complete password-based sign-in.
 CREATE TABLE IF NOT EXISTS login_otps (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  code_hash TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  attempts INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_otps (
   user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   code_hash TEXT NOT NULL,
   expires_at TIMESTAMPTZ NOT NULL,

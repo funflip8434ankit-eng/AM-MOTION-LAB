@@ -31,16 +31,43 @@ function offlineCourseAnswer(question) {
   if (/\b(timing and spacing|spacing in animation|animation timing)\b/.test(text)) {
     return "Timing is how long an action takes; spacing is how far an object moves between frames. Close spacing makes movement slower, while wider spacing makes it faster. Varying both helps show weight, acceleration, and the character of an action.";
   }
+  if (/\b(easing|ease in|ease out|ease in out)\b/.test(text)) {
+    return "Easing controls how an animation speeds up or slows down. Ease-in starts gently and accelerates; ease-out slows before it stops; ease-in-out does both. Use the graph editor or keyframe interpolation controls to shape the motion, then preview it to check that it feels natural.";
+  }
+  if (/\b(squash and stretch|squash stretch)\b/.test(text)) {
+    return "Squash and stretch is an animation principle that changes an object's shape as it moves. A soft object may squash on impact and stretch while moving quickly. Keep its overall volume consistent so the motion feels lively without making the object appear to grow or shrink.";
+  }
+  if (/\b(mask|masking)\b/.test(text)) {
+    return "A mask controls which parts of a layer are visible. You can use a shape or path to reveal, hide, or isolate part of an image or video without deleting the original layer. Animate the mask when you want the visible area to change over time.";
+  }
+  if (/\b(layers?|layer order)\b/.test(text)) {
+    return "Layers keep video, images, text, shapes, and effects separate in a project. Their stacking order controls what appears in front: higher layers usually cover lower ones. Naming and grouping layers makes a project easier to edit.";
+  }
+  if (/\b(composition|visual hierarchy)\b/.test(text)) {
+    return "Composition is how visual elements are arranged inside a frame. Give the main subject clear emphasis, use spacing and alignment to guide the viewer, and keep secondary details from competing with the main message. Check the layout at the final viewing size.";
+  }
+  if (/\b(resolution|1080p|4k|pixels)\b/.test(text)) {
+    return "Resolution describes the pixel dimensions of an image or video frame. Higher resolution can preserve more detail, but it also creates larger files and takes more processing. Choose a resolution that matches the intended platform or delivery requirement, and keep the project and export settings consistent.";
+  }
+  if (/\b(color correction|white balance|exposure)\b/.test(text)) {
+    return "Color correction adjusts an image toward a clean, consistent starting point. First check exposure and contrast, then correct white balance so neutral objects look neutral. Match shots before adding a creative color grade, and review the result on the full sequence.";
+  }
+  if (/\b(vector|raster|pixel image)\b/.test(text)) {
+    return "Vector artwork is made from paths and shapes, so it can usually scale without becoming pixelated. Raster artwork is made from a grid of pixels and can lose sharpness when enlarged too far. Logos and icons are often kept as vectors; photos are typically raster images.";
+  }
+  if (/\b(render|export|codec|bitrate)\b/.test(text)) {
+    return "Rendering or exporting creates a final video file from the editable project. Choose the required frame size and frame rate first, then select a format and quality suitable for the destination. Preview the exported file to check picture, audio, and timing before sharing it.";
+  }
   return "";
 }
 
 async function generateStudyAnswer(question, options = {}) {
   const apiKey = process.env.GEMINI_API_KEY || "";
-  if (!apiKey) throw new Error("Study assistant is not configured.");
 
   // Answer common course concepts immediately instead of waiting on an AI API call.
   const instantAnswer = offlineCourseAnswer(question);
   if (instantAnswer) return { answered: true, answer: instantAnswer, source: "course-faq" };
+  if (!apiKey) return { answered: false, answer: FALLBACK, source: "fallback" };
 
   const selectedCourse = options.courseId && COURSES[options.courseId] ? options.courseId : "";
   const instruction = [
@@ -66,7 +93,7 @@ async function generateStudyAnswer(question, options = {}) {
     });
     const requestModel = async (model) => {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const timeout = setTimeout(() => controller.abort(), 6000);
       try {
         const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent", {
           method: "POST",
@@ -87,9 +114,10 @@ async function generateStudyAnswer(question, options = {}) {
     };
     let currentModel = MODEL;
     let result = await requestModel(currentModel);
-    // Keep one backup attempt so an overloaded model cannot hold the chat for too long.
-    for (const fallbackModel of [FALLBACK_MODEL]) {
-      if (!result.timedOut && result.response.status !== 503) break;
+    // Keep backup attempts short and only retry transient overload/server failures.
+    for (const fallbackModel of [FALLBACK_MODEL, SECOND_FALLBACK_MODEL]) {
+      const retryable = result.timedOut || (result.response && [408, 429, 500, 502, 503, 504].includes(result.response.status));
+      if (!retryable) break;
       if (!fallbackModel || fallbackModel === currentModel) continue;
       console.warn("Gemini model " + currentModel + (result.timedOut ? " timed out" : " is overloaded") + "; retrying with " + fallbackModel + ".");
       currentModel = fallbackModel;
