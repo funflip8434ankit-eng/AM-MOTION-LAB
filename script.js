@@ -326,7 +326,9 @@
   // itself, plus the matching course card's skill chips, since both
   // already describe the same discipline). Nothing is invented.
   learnCards.forEach((card) => {
-    card.addEventListener("click", function () {
+    const detailsButton = card.querySelector("[data-learn-details]");
+    if (!detailsButton) return;
+    detailsButton.addEventListener("click", function () {
       const key = card.getAttribute("data-panel");
       const title = card.querySelector("h3")
         ? card.querySelector("h3").innerHTML
@@ -369,8 +371,8 @@
       openModal(html);
     });
 
-    // Keyboard support: cards are native <button> elements, so Enter and
-    // Space already trigger "click" — no extra listener needed.
+    // Details and Enter course controls are native buttons and links, so
+    // keyboard activation works without extra key handlers.
   });
 
   // --- 6b. Course cards -> modal ---------------------------------------
@@ -1497,14 +1499,19 @@
         "<h3>Payment verified</h3>" +
         "<p>Your payment for <strong>" + esc(p.course) + " \u2014 " + esc(p.level) + "</strong> has been verified.</p>" +
         '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
-        '<button type="button" class="btn btn--primary" id="coDone">Done</button>'
+        '<button type="button" class="btn btn--primary" id="coOpenCourse">Open my course</button>'
       : '<div class="co-result__icon co-result__icon--warn">' + warnIcon + "</div>" +
         "<h3>We couldn\u2019t verify your payment</h3>" +
         "<p>Your payment could not be confirmed automatically. If money was deducted, please contact AM Motion Lab with the payment ID below \u2014 do not pay again.</p>" +
         '<span class="co-result__ref">Payment ID: ' + esc(paymentId) + "</span><br>" +
         '<button type="button" class="btn btn--ghost" id="coDone">Close</button>';
     const done = byId("coDone");
+    const openCourse = byId("coOpenCourse");
     if (done) done.addEventListener("click", closeCheckout);
+    if (openCourse) openCourse.addEventListener("click", function () {
+      window.location.href = "student/course.html?course=" + encodeURIComponent(p.courseId) + "&level=" + encodeURIComponent(p.levelId);
+    });
     if (done) done.focus();
+    if (openCourse) openCourse.focus();
   }
 })();

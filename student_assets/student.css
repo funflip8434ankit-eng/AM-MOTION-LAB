@@ -78,6 +78,9 @@ input:focus{outline:2px solid var(--sky);outline-offset:1px}
 .certificate-record p{font-size:.9rem;line-height:1.65;color:var(--ink-dim)}
 .certificate-note{margin-top:14px;padding-top:14px;border-top:1px solid var(--glass-border);font-size:.82rem!important}
 .course-progress{margin:20px 0 24px}
+.course-empty{margin:22px 0;padding:24px;border:1px solid var(--glass-border);border-radius:16px;background:rgba(248,250,252,.04)}
+.course-empty h2{margin-bottom:8px;color:var(--off-white);font-size:1.15rem}
+.course-empty p{color:var(--ink-dim);font-size:.9rem;line-height:1.65}
 .course-progress__label{display:flex;justify-content:space-between;gap:12px;color:var(--ink-dim);font-size:.84rem;margin-bottom:8px}
 .course-progress__track{height:8px;overflow:hidden;border-radius:999px;background:rgba(248,250,252,.1)}
 .course-progress__value{height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--ok));transition:width .25s ease}

@@ -570,6 +570,10 @@ section{
   font-weight: 600;
   color: var(--sky);
 }
+.learn-card__actions{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:10px}
+.learn-card__actions .learn-card__more{margin:0;padding:0;border:0;background:none;font:inherit;font-size:.85rem;font-weight:600;color:var(--sky);cursor:pointer}
+.learn-card__enter{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border:1px solid var(--glass-border);border-radius:999px;color:var(--off-white);font-size:.78rem;font-weight:600;text-decoration:none;transition:background .2s,border-color .2s}
+.learn-card__enter:hover,.learn-card__enter:focus-visible{background:rgba(96,165,250,.14);border-color:var(--sky)}
 
 /* =========================================================
    COURSES

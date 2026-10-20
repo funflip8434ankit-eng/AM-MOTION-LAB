@@ -17,6 +17,11 @@
 		<h1 id="course-title">Loading course…</h1>
 		<p class="sub" id="course-overview">Please wait while we load your lessons.</p>
 		<div id="course-content" hidden>
+			<section class="course-empty" id="course-empty" hidden aria-live="polite">
+				<h2>Content is on the way</h2>
+				<p>Your enrollment is saved, but lessons for this course have not been uploaded yet. Please check back later.</p>
+				<a class="portal-link" id="course-preview-cta" href="../courses.html#plans" hidden>Explore course plans</a>
+			</section>
 			<div class="course-progress" aria-live="polite">
 				<div class="course-progress__label"><span>Course progress</span><span id="progress-count">0 / 0 lessons</span></div>
 				<div class="course-progress__track" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
@@ -33,17 +38,49 @@
 <script src="../student_assets/student.js"></script>
 <script>
 (async function () {
-	if (!AMML.getToken()) { location.replace("login.html"); return; }
 	var params = new URLSearchParams(location.search);
 	var courseId = params.get("course") || "";
 	var levelId = params.get("level") || "";
+	var previewMode = params.get("preview") === "1";
 	var title = document.getElementById("course-title");
 	var overview = document.getElementById("course-overview");
 	var content = document.getElementById("course-content");
+	var empty = document.getElementById("course-empty");
+	var progress = document.querySelector(".course-progress");
 	var message = document.getElementById("course-message");
 	var groups = document.getElementById("lesson-groups");
+	var logoutButton = document.getElementById("logout");
 
-	document.getElementById("logout").addEventListener("click", function () {
+	if (previewMode) {
+		var previewNames = {
+			"video-editing": "Video Editing",
+			"motion-graphics": "Motion Graphics",
+			"animation": "2D & 3D Animation",
+			"graphic-designing": "Graphic Design"
+		};
+		if (!previewNames[courseId]) {
+			title.textContent = "Course unavailable";
+			overview.textContent = "This course preview could not be found.";
+			logoutButton.hidden = true;
+			return;
+		}
+		title.textContent = previewNames[courseId];
+		document.title = previewNames[courseId] + " — AM Motion Lab";
+		overview.textContent = "Public course preview";
+		empty.querySelector("p").textContent = "Course materials have not been uploaded yet. You can explore the course plans while we prepare the lessons.";
+		empty.querySelector("#course-preview-cta").hidden = false;
+		progress.hidden = true;
+		message.hidden = true;
+		groups.hidden = true;
+		empty.hidden = false;
+		content.hidden = false;
+		logoutButton.hidden = true;
+		return;
+	}
+
+	if (!AMML.getToken()) { location.replace("login.html"); return; }
+
+	logoutButton.addEventListener("click", function () {
 		AMML.clearToken();
 		location.replace("login.html");
 	});
@@ -72,6 +109,22 @@
 		try {
 			var data = await AMML.api("/api/learning/courses/" + encodeURIComponent(courseId) + "?levelId=" + encodeURIComponent(levelId));
 			title.textContent = data.courseName + " — " + data.levelName;
+			var hasCourseMaterials = Array.isArray(data.lessons) && data.lessons.some(function (lesson) {
+				return Boolean(lesson.videoUrl || lesson.contentUrl || lesson.materialUrl);
+			});
+			if (!hasCourseMaterials) {
+				overview.textContent = "Your enrollment is active. Course lessons are not available yet.";
+				progress.hidden = true;
+				message.hidden = true;
+				groups.hidden = true;
+				empty.hidden = false;
+				content.hidden = false;
+				return;
+			}
+			empty.hidden = true;
+			progress.hidden = false;
+			message.hidden = false;
+			groups.hidden = false;
 			overview.textContent = data.overview + " Mark each lesson complete after you finish it; a certificate is issued when all lessons in this level are complete.";
 			document.title = data.courseName + " — AM Motion Lab";
 			document.getElementById("progress-count").textContent = data.completedCount + " / " + data.lessons.length + " lessons";
