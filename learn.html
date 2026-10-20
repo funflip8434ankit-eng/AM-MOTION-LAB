@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Learn — AM Motion Lab</title>
+<title>Purchased Courses — AM Motion Lab</title>
 <meta name="description" content="AM Motion Lab is an online creative learning platform teaching video editing, motion graphics, animation and graphic design through practical, project-based training.">
 <link rel="icon" type="image/png" href="image_web/icon_logo.png">
 
@@ -35,7 +35,7 @@
 
     <nav class="nav__links" aria-label="Primary">
       <a href="index.html">Home</a>
-      <a href="learn.html" aria-current="page">Learn</a>
+      <a href="learn.html" aria-current="page">Purchased Courses</a>
       <a href="courses.html">Courses</a>
       <a href="student/certificate-center.html">Certificates</a>
       <a href="projects.html">Projects</a>
@@ -53,7 +53,7 @@
 
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
-    <a href="learn.html" aria-current="page">Learn</a>
+    <a href="learn.html" aria-current="page">Purchased Courses</a>
     <a href="courses.html">Courses</a>
     <a href="student/certificate-center.html">Certificates</a>
     <a href="projects.html">Projects</a>
@@ -66,59 +66,15 @@
 
 <main>
 
-<!-- ================= WHAT YOU'LL LEARN ================= -->
+<!-- ================= PURCHASED COURSES ================= -->
 <section class="learn page-first" id="learn">
   <div class="section-head" data-reveal>
-    <p class="eyebrow">What You'll Learn</p>
-    <h2>Four creative disciplines. One practical path.</h2>
+    <p class="eyebrow">Your learning</p>
+    <h2>Purchased Courses</h2>
   </div>
 
-  <div class="learn__grid" data-reveal>
-
-    <article class="learn-card" data-panel="video-editing">
-      <span class="learn-card__num">01</span>
-      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5.5" width="13" height="13" rx="2"/><path d="M15.5 9.5l6-3.2v11.4l-6-3.2"/></svg>
-      <h3>Video Editing</h3>
-      <p>Professional editing, storytelling, pacing, transitions, sound design and social-media-ready content.</p>
-      <div class="learn-card__actions">
-        <button type="button" class="learn-card__more" data-learn-details>View details</button>
-        <a class="learn-card__enter" href="student/course.html?course=video-editing&amp;preview=1">Enter course</a>
-      </div>
-    </article>
-
-    <article class="learn-card" data-panel="motion-graphics">
-      <span class="learn-card__num">02</span>
-      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12a8 8 0 1 1 8 8"/><path d="M4 12l3-3M4 12l3 3"/></svg>
-      <h3>Motion Graphics</h3>
-      <p>Animation principles, typography animation, visual effects, compositing and motion design.</p>
-      <div class="learn-card__actions">
-        <button type="button" class="learn-card__more" data-learn-details>View details</button>
-        <a class="learn-card__enter" href="student/course.html?course=motion-graphics&amp;preview=1">Enter course</a>
-      </div>
-    </article>
-
-    <article class="learn-card" data-panel="animation">
-      <span class="learn-card__num">03</span>
-      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 3v18M4 7.5l8 4.5 8-4.5"/></svg>
-      <h3>2D &amp; 3D Animation</h3>
-      <p>Animation fundamentals, 3D workflows, modelling and animation concepts, creative visual production.</p>
-      <div class="learn-card__actions">
-        <button type="button" class="learn-card__more" data-learn-details>View details</button>
-        <a class="learn-card__enter" href="student/course.html?course=animation&amp;preview=1">Enter course</a>
-      </div>
-    </article>
-
-    <article class="learn-card" data-panel="graphic-design">
-      <span class="learn-card__num">04</span>
-      <svg class="learn-card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="8.5" r="3"/><path d="M2.5 20.5l6-6 3 3 4-4 6 6"/></svg>
-      <h3>Graphic Design</h3>
-      <p>Visual composition, branding, layouts, social creatives and core design fundamentals.</p>
-      <div class="learn-card__actions">
-        <button type="button" class="learn-card__more" data-learn-details>View details</button>
-        <a class="learn-card__enter" href="student/course.html?course=graphic-designing&amp;preview=1">Enter course</a>
-      </div>
-    </article>
-
+  <div class="learn__grid" id="purchased-courses" data-reveal aria-live="polite">
+    <p class="purchased-courses__state">Loading your purchased courses…</p>
   </div>
 </section>
 
@@ -144,7 +100,7 @@
     <div class="footer__col">
       <h4>Navigate</h4>
       <a href="index.html">Home</a>
-      <a href="learn.html">Learn</a>
+      <a href="learn.html">Purchased Courses</a>
       <a href="courses.html">Courses</a>
       <a href="projects.html">Projects</a>
       <a href="about.html">About</a>
@@ -176,6 +132,90 @@
 
 <script src="script.js"></script>
 <script src="student_assets/student.js"></script>
+<script>
+(function () {
+  var grid = document.getElementById("purchased-courses");
+  var names = {
+    "video-editing": "Video Editing",
+    "motion-graphics": "Motion Graphics",
+    "2d-animation": "2D Animation",
+    "3d-animation": "3D Animation",
+    "graphic-designing": "Graphic Designing"
+  };
+  var rank = { basic: 1, advanced: 2, professional: 3 };
+
+  function showState(title, text, linkText, href) {
+    grid.replaceChildren();
+    var panel = document.createElement("section");
+    panel.className = "purchased-courses__empty";
+    var heading = document.createElement("h3");
+    heading.textContent = title;
+    var copy = document.createElement("p");
+    copy.textContent = text;
+    panel.append(heading, copy);
+    if (linkText && href) {
+      var link = document.createElement("a");
+      link.className = "learn-card__enter";
+      link.href = href;
+      link.textContent = linkText;
+      panel.appendChild(link);
+    }
+    grid.appendChild(panel);
+  }
+
+  if (!window.AMML || !AMML.getToken()) {
+    showState("Sign in to view your courses", "Your purchased courses will appear here after you sign in.", "Log in", "student/login.html?next=purchased");
+    return;
+  }
+
+  AMML.api("/api/auth/me").then(function (data) {
+    var purchases = new Map();
+    (Array.isArray(data.enrollments) ? data.enrollments : []).forEach(function (enrollment) {
+      if (!names[enrollment.courseId] || !rank[enrollment.levelId]) return;
+      var current = purchases.get(enrollment.courseId);
+      if (!current || rank[enrollment.levelId] > rank[current.levelId]) {
+        purchases.set(enrollment.courseId, enrollment);
+      }
+    });
+
+    if (!purchases.size) {
+      showState("No purchased courses yet", "After you purchase a course, it will appear here.", "Browse courses", "courses.html");
+      return;
+    }
+
+    grid.replaceChildren();
+    Array.from(purchases.entries()).forEach(function (entry, index) {
+      var courseId = entry[0];
+      var enrollment = entry[1];
+      var card = document.createElement("article");
+      card.className = "learn-card purchased-course-card";
+      var number = document.createElement("span");
+      number.className = "learn-card__num";
+      number.textContent = String(index + 1).padStart(2, "0");
+      var title = document.createElement("h3");
+      title.textContent = names[courseId];
+      var level = document.createElement("p");
+      level.textContent = "Purchased: " + AMML.levelName(enrollment.levelId);
+      var actions = document.createElement("div");
+      actions.className = "learn-card__actions";
+      var explore = document.createElement("a");
+      explore.className = "learn-card__enter";
+      explore.href = "student/course.html?course=" + encodeURIComponent(courseId) + "&level=" + encodeURIComponent(enrollment.levelId);
+      explore.textContent = "Explore course";
+      actions.appendChild(explore);
+      card.append(number, title, level, actions);
+      grid.appendChild(card);
+    });
+  }).catch(function (error) {
+    if (error.status === 401) {
+      AMML.clearToken();
+      showState("Please sign in again", "Your session has expired. Sign in to load your purchased courses.", "Log in", "student/login.html?next=purchased");
+    } else {
+      showState("Could not load your courses", error.message || "Please try again in a moment.", "Retry", "learn.html");
+    }
+  });
+})();
+</script>
 <script src="student_assets/study-chat.js"></script>
 </body>
 </html>

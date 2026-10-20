@@ -72,7 +72,7 @@
   document.getElementById("alt").href = "register.html" + location.search;
   var next = new URLSearchParams(location.search).get("next");
   if (next === "certificates") document.querySelectorAll("[data-nav-certificates]").forEach(function (link) { link.setAttribute("aria-current", "page"); });
-  var dest = next === "certificates" ? "certificate-center.html" : "../courses.html";
+  var dest = next === "certificates" ? "certificate-center.html" : (next === "purchased" ? "../learn.html" : "../courses.html");
   var forgotStep = document.getElementById("forgotStep"), resetFields = document.getElementById("resetFields");
   document.getElementById("forgotPassword").addEventListener("click", function () {
     credentialsStep.hidden = true; otpStep.hidden = true; forgotStep.hidden = false;

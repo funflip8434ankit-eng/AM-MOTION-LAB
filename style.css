@@ -574,6 +574,11 @@ section{
 .learn-card__actions .learn-card__more{margin:0;padding:0;border:0;background:none;font:inherit;font-size:.85rem;font-weight:600;color:var(--sky);cursor:pointer}
 .learn-card__enter{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border:1px solid var(--glass-border);border-radius:999px;color:var(--off-white);font-size:.78rem;font-weight:600;text-decoration:none;transition:background .2s,border-color .2s}
 .learn-card__enter:hover,.learn-card__enter:focus-visible{background:rgba(96,165,250,.14);border-color:var(--sky)}
+.purchased-courses__state{grid-column:1/-1;color:var(--ink-dim);text-align:center}
+.purchased-courses__empty{grid-column:1/-1;display:grid;justify-items:center;gap:12px;padding:34px 24px;border:1px solid var(--glass-border);border-radius:var(--radius-m);background:var(--glass-surface);text-align:center}
+.purchased-courses__empty h3{color:var(--off-white);font-size:1.15rem}
+.purchased-courses__empty p{max-width:520px;color:var(--ink-dim);font-size:.92rem;line-height:1.6}
+.purchased-course-card .learn-card__actions{justify-content:flex-start}
 
 /* =========================================================
    COURSES

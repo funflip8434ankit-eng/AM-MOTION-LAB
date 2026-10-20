@@ -65,7 +65,7 @@
   document.getElementById("alt").href = "login.html" + location.search;
   var next = new URLSearchParams(location.search).get("next");
   if (next === "certificates") document.querySelectorAll("[data-nav-certificates]").forEach(function (link) { link.setAttribute("aria-current", "page"); });
-  var dest = next === "certificates" ? "certificate-center.html" : "../courses.html";
+  var dest = next === "certificates" ? "certificate-center.html" : (next === "purchased" ? "../learn.html" : "../courses.html");
   function fail(t) { msg.className = "msg err"; msg.textContent = t; btn.disabled = false; }
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
