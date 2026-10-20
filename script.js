@@ -843,7 +843,7 @@
     try { return localStorage.getItem("amml_token") || ""; } catch (e) { return ""; }
   }
   const PAYMENT_CONFIG = {
-    keyId: "rzp_test_TjNiQPSBosqNNi",                    // <-- public Key ID (rzp_test_... / rzp_live_...)
+    keyId: "rzp_test_TpItvO0Rb9S0h5",                    // <-- public Key ID (rzp_test_... / rzp_live_...)
     checkoutEndpoint: API_BASE + "/api/create-order",    // backend: creates the Razorpay order
     verifyEndpoint: API_BASE + "/api/verify-payment",    // backend: verifies the payment signature
     businessName: "AM Motion Lab",
