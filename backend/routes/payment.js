@@ -20,7 +20,12 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
   router.post("/create-order", checkoutLimiter, requireAuth, async (req, res) => {
     try {
       const { courseId, levelId } = req.body || {};
-      const price = PRICES[courseId] && PRICES[courseId][levelId];
+      const coursePrices = typeof courseId === "string" && Object.prototype.hasOwnProperty.call(PRICES, courseId)
+        ? PRICES[courseId]
+        : null;
+      const price = coursePrices && typeof levelId === "string" && Object.prototype.hasOwnProperty.call(coursePrices, levelId)
+        ? coursePrices[levelId]
+        : null;
       if (!price) return res.status(400).json({ error: "Invalid course or level." });
 
       const u = await pool.query("SELECT id, name, email, phone FROM users WHERE id = $1", [req.user.id]);
@@ -60,7 +65,11 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
   /* ---------- Verify payment + create enrollment (login required) ---------- */
   router.post("/verify-payment", checkoutLimiter, requireAuth, async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
-    if (![razorpay_order_id, razorpay_payment_id, razorpay_signature].every((v) => typeof v === "string" && v)) {
+    if (
+      typeof razorpay_order_id !== "string" || !/^order_[A-Za-z0-9]+$/.test(razorpay_order_id) || razorpay_order_id.length > 64 ||
+      typeof razorpay_payment_id !== "string" || !/^pay_[A-Za-z0-9]+$/.test(razorpay_payment_id) || razorpay_payment_id.length > 64 ||
+      typeof razorpay_signature !== "string" || !/^[a-f\d]{64}$/i.test(razorpay_signature)
+    ) {
       return res.status(400).json({ verified: false });
     }
 
@@ -82,16 +91,23 @@ module.exports = function paymentRoutes(razorpay, KEY_SECRET, PRICES) {
         razorpay.payments.fetch(razorpay_payment_id),
       ]);
       const n = order.notes || {};
-      const price = PRICES[n.courseId] && PRICES[n.courseId][n.levelId];
+      const coursePrices = typeof n.courseId === "string" && Object.prototype.hasOwnProperty.call(PRICES, n.courseId)
+        ? PRICES[n.courseId]
+        : null;
+      const price = coursePrices && typeof n.levelId === "string" && Object.prototype.hasOwnProperty.call(coursePrices, n.levelId)
+        ? coursePrices[n.levelId]
+        : null;
       // Never grant course access for an authorization that has not been captured.
       const statusOk = payment.status === "captured";
 
       if (
         !price ||
         String(n.userId) !== String(req.user.id) ||
+        order.currency !== "INR" ||
         order.amount !== price * 100 ||
         payment.order_id !== razorpay_order_id ||
         payment.amount !== order.amount ||
+        payment.currency !== "INR" ||
         !statusOk
       ) {
         console.error("verify-payment mismatch for order", razorpay_order_id);

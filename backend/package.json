@@ -5,7 +5,8 @@
   "description": "Server-side Razorpay order creation and payment verification for AM Motion Lab",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

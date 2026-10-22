@@ -45,6 +45,28 @@ The backend also serves the website at `http://localhost:3000`.
 - `/api/learning/*` provides enrolled course lessons, progress tracking, and certificates.
 - `GET /health` checks the API process and PostgreSQL connection.
 
+## Security checks
+
+Run `npm test` from this directory for a mocked student journey covering
+registration, email-code verification, server-priced checkout, captured-payment
+verification, purchased course access, and denial of another student's access.
+The tests use an in-memory database/payment adapter and never charge a real card.
+
+GitHub Actions runs these tests, `npm audit --omit=dev`, and CodeQL on pushes to
+`main` and pull requests. Dependabot checks backend npm packages and workflow
+actions weekly. Enable dependency alerts and code scanning in repository settings
+so findings appear in the Security tab.
+
+The API uses bearer JWTs (not cookies), so browser requests do not rely on
+ambient cookie credentials and CSRF tokens are not used. Frontend tokens are
+stored in browser storage; prevent XSS and keep the token lifetime limited.
+There are no admin routes or server-side file-upload endpoints today. Add
+separate roles/MFA and upload validation if those features are introduced.
+
+The Express security headers apply to responses served by this backend. The
+GitHub Pages origin needs HTTPS and any response-header policy configured at its
+own host; Express cannot add headers to responses served by GitHub Pages.
+
 Prices are maintained in `server.js` (authoritative) and `script.js` (display). Change both together.
 
 ## Gmail setup
@@ -56,4 +78,5 @@ Enable Gmail API and add `http://localhost:3000/api/gmail/oauth/callback` as an 
 1. Configure the Razorpay webhook for `payment.captured` and set `RAZORPAY_WEBHOOK_SECRET`.
 2. Set a strong `JWT_SECRET`, configure Google Sign-In origins, and verify Gmail OTP delivery.
 3. Verify Study Q&A using production environment credentials.
-4. Confirm HTTPS, database backups, environment variables, and GitHub Pages/Render deployment settings.
+4. Confirm HTTPS, database backups and a restore, environment variables, and
+   GitHub Pages/Render deployment settings. See the repository `SECURITY.md`.

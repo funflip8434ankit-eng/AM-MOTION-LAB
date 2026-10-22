@@ -22,7 +22,7 @@ router.post("/ask", askLimiter, requireAuth, async (req, res) => {
   if (question.length < 2 || question.length > 1200) {
     return res.status(400).json({ error: "Please enter a question between 2 and 1,200 characters." });
   }
-  if (courseId && !COURSES[courseId]) return res.status(400).json({ error: "Unknown course." });
+  if (courseId && !Object.prototype.hasOwnProperty.call(COURSES, courseId)) return res.status(400).json({ error: "Unknown course." });
   if (history !== undefined && !Array.isArray(history)) return res.status(400).json({ error: "Invalid chat history." });
   const safeHistory = (Array.isArray(history) ? history : []).slice(-8);
   if (safeHistory.some((item) => !item || !["user", "model"].includes(item.role) || typeof item.text !== "string" || !item.text.trim() || item.text.length > 1200)) {

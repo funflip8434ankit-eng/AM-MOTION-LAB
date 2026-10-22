@@ -8,8 +8,8 @@ const router = express.Router();
 router.use(requireAuth);
 
 async function getAccess(userId, courseId, levelId) {
+  if (!Object.prototype.hasOwnProperty.call(COURSES, courseId) || !Object.prototype.hasOwnProperty.call(LEVEL_RANK, levelId)) return null;
   const course = COURSES[courseId];
-  if (!course || !LEVEL_RANK[levelId]) return null;
   const result = await pool.query(
     "SELECT level_id FROM enrollments WHERE user_id = $1 AND course_id = $2 AND payment_status = 'paid'",
     [userId, courseId]
@@ -62,8 +62,10 @@ router.get("/courses/:courseId", async (req, res) => {
 router.post("/courses/:courseId/lessons/:lessonId/complete", async (req, res) => {
   const { courseId, lessonId } = req.params;
   const { levelId } = req.body || {};
+  if (!Object.prototype.hasOwnProperty.call(COURSES, courseId) || !Object.prototype.hasOwnProperty.call(LEVEL_RANK, levelId)) {
+    return res.status(400).json({ error: "Invalid course or level." });
+  }
   const course = COURSES[courseId];
-  if (!course || !LEVEL_RANK[levelId]) return res.status(400).json({ error: "Invalid course or level." });
 
   const level = course.levels[levelId];
   const lessons = course.lessons.slice(0, level.lessonCount);

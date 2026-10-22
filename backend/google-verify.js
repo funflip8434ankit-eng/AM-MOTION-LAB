@@ -5,7 +5,7 @@ let keysExpireAt = 0;
 
 async function getGoogleKeys() {
   if (cachedKeys && Date.now() < keysExpireAt) return cachedKeys;
-  const response = await fetch("https://www.googleapis.com/oauth2/v3/certs");
+  const response = await fetch("https://www.googleapis.com/oauth2/v3/certs", { signal: AbortSignal.timeout(10000) });
   if (!response.ok) throw new Error("Could not load Google signing keys.");
   cachedKeys = await response.json();
   const cacheControl = response.headers.get("cache-control") || "";

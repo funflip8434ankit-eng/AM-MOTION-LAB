@@ -34,15 +34,57 @@ const PRICES = {
   "motion-graphics":   { basic: 5999,  advanced: 7999,  professional: 11999 },
   "3d-animation":      { basic: 14999, advanced: 17999, professional: 24999 },
 };
+const getCoursePrice = (courseId, levelId) => {
+  if (typeof courseId !== "string" || typeof levelId !== "string") return null;
+  if (!Object.prototype.hasOwnProperty.call(PRICES, courseId)) return null;
+  const levels = PRICES[courseId];
+  return Object.prototype.hasOwnProperty.call(levels, levelId) ? levels[levelId] : null;
+};
 
 const app = express();
 /* ---------- CORS: only our own websites may call this backend ---------- */
 app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// Security headers for responses served through this Express service.
+// GitHub Pages has separate response headers configured by GitHub.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://accounts.google.com https://checkout.razorpay.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "connect-src 'self' https://am-motion-lab-9ui2.onrender.com https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https://generativelanguage.googleapis.com https://*.razorpay.com",
+  "frame-src https://accounts.google.com https://*.razorpay.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://accounts.google.com https://*.razorpay.com",
+  "frame-ancestors 'none'",
+].join("; ");
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  // Report-only lets us observe CSP issues before enforcing a policy that
+  // could interfere with the inline pages, Google sign-in, or Razorpay Checkout.
+  res.setHeader("Content-Security-Policy-Report-Only", CSP_REPORT_ONLY);
+
+  const forwardedProto = (req.get("x-forwarded-proto") || "").split(",")[0].trim();
+  if (req.secure || forwardedProto === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000");
+  }
+  next();
+});
+
 const ALLOWED_ORIGINS = [
-  "https://funflip8434ankit-eng.github.io", // live website (GitHub Pages)
-  "http://127.0.0.1:5500",                  // VS Code Live Server (testing)
-  "http://localhost:5500",
-  "http://localhost:3000",                  // local backend (testing)
+  process.env.PUBLIC_SITE_ORIGIN || "https://funflip8434ankit-eng.github.io",
+  ...(process.env.NODE_ENV === "production" ? [] : [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "http://localhost:3000",
+  ]),
 ];
 
 app.use((req, res, next) => {
@@ -67,7 +109,7 @@ const webhookLimiter = rateLimit({
 app.post("/api/webhooks/razorpay", webhookLimiter, express.raw({ type: "application/json", limit: "1mb" }), async (req, res) => {
   if (!WEBHOOK_SECRET) return res.status(503).json({ error: "Payment webhook is not configured." });
   const signature = req.get("x-razorpay-signature") || "";
-  if (!Buffer.isBuffer(req.body) || !signature) return res.status(400).json({ error: "Invalid webhook request." });
+  if (!Buffer.isBuffer(req.body) || !/^[a-f\d]{64}$/i.test(signature)) return res.status(400).json({ error: "Invalid webhook request." });
 
   const expected = crypto.createHmac("sha256", WEBHOOK_SECRET).update(req.body).digest("hex");
   const expectedBytes = Buffer.from(expected, "hex");
@@ -86,12 +128,16 @@ app.post("/api/webhooks/razorpay", webhookLimiter, express.raw({ type: "applicat
 
   try {
     const payment = event.payload && event.payload.payment && event.payload.payment.entity;
-    if (!payment || payment.status !== "captured" || !payment.id || !payment.order_id) {
+    if (
+      !payment || payment.status !== "captured" ||
+      typeof payment.id !== "string" || !/^pay_[A-Za-z0-9]+$/.test(payment.id) || payment.id.length > 64 ||
+      typeof payment.order_id !== "string" || !/^order_[A-Za-z0-9]+$/.test(payment.order_id) || payment.order_id.length > 64
+    ) {
       return res.status(400).json({ error: "Invalid captured payment event." });
     }
     const order = await razorpay.orders.fetch(payment.order_id);
     const notes = order.notes || {};
-    const price = PRICES[notes.courseId] && PRICES[notes.courseId][notes.levelId];
+    const price = getCoursePrice(notes.courseId, notes.levelId);
     const userId = Number(notes.userId);
     if (
       !Number.isInteger(userId) || userId < 1 || !price ||

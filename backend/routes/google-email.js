@@ -55,6 +55,7 @@ function getAccessToken() {
       refresh_token: refreshToken,
       grant_type: "refresh_token",
     }),
+    signal: AbortSignal.timeout(10000),
   }).then(async (response) => {
     const body = await response.json();
     if (!response.ok || !body.access_token) throw new Error("Google could not authorize the Gmail sender.");
@@ -81,6 +82,7 @@ async function sendGmailMessage(accessToken, to, subject, messageText, replyTo) 
     method: "POST",
     headers: { Authorization: "Bearer " + accessToken, "Content-Type": "application/json" },
     body: JSON.stringify({ raw: Buffer.from(rawMessage).toString("base64url") }),
+    signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("Gmail API could not send a message.");
 }
@@ -137,6 +139,7 @@ router.get("/gmail/oauth/callback", async (req, res) => {
         redirect_uri: REDIRECT_URI,
         grant_type: "authorization_code",
       }),
+      signal: AbortSignal.timeout(10000),
     });
     const tokens = await response.json();
     if (!response.ok || !tokens.refresh_token) throw new Error("Google did not return a refresh token. Reconnect with consent.");

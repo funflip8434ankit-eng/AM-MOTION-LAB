@@ -69,7 +69,9 @@ async function generateStudyAnswer(question, options = {}) {
   if (instantAnswer) return { answered: true, answer: instantAnswer, source: "course-faq" };
   if (!apiKey) return { answered: false, answer: FALLBACK, source: "fallback" };
 
-  const selectedCourse = options.courseId && COURSES[options.courseId] ? options.courseId : "";
+  const selectedCourse = options.courseId && Object.prototype.hasOwnProperty.call(COURSES, options.courseId)
+    ? options.courseId
+    : "";
   const instruction = [
     "You are the AM Motion Lab study assistant. Help learners with study questions about video editing, 2D animation, 3D animation, graphic design, and motion graphics.",
     "Use the course outline below as the source for AM Motion Lab-specific facts. You may explain a basic concept in these fields using general knowledge, but never claim that an unlisted topic, fee, schedule, software version, or feature is included in an AM Motion Lab course.",

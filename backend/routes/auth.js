@@ -18,6 +18,7 @@ if (!JWT_SECRET || JWT_SECRET.length < 32 || JWT_SECRET.startsWith("REPLACE_")) 
 }
 
 const router = express.Router();
+const isValidEmail = (email) => email.length <= 150 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 // Stops someone from trying thousands of passwords.
 const limiter = rateLimit({
@@ -59,7 +60,7 @@ async function issueLoginOtp(user) {
 }
 
 async function finishOtpLogin(email, code, res) {
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) {
+  if (!isValidEmail(email) || !/^\d{6}$/.test(code)) {
     return res.status(400).json({ error: "Enter the 6-digit code sent to your email." });
   }
   const result = await pool.query(
@@ -182,6 +183,9 @@ router.post("/login", limiter, async (req, res) => {
   try {
     const email = String((req.body && req.body.email) || "").trim().toLowerCase();
     const password = String((req.body && req.body.password) || "");
+    if (!isValidEmail(email) || password.length > 72) {
+      return res.status(400).json({ error: "Invalid email or password." });
+    }
     const r = await pool.query("SELECT id, name, email, phone, password_hash FROM users WHERE email = $1", [email]);
     const user = r.rows[0];
     const hash = user && user.password_hash ? user.password_hash : DUMMY_HASH;
@@ -210,7 +214,7 @@ router.post("/login/resend-otp", limiter, async (req, res) => {
   try {
     const email = String((req.body && req.body.email) || "").trim().toLowerCase();
     const password = String((req.body && req.body.password) || "");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Please enter a valid email." });
+    if (!isValidEmail(email) || password.length > 72) return res.status(400).json({ error: "Please enter a valid email and password." });
     const result = await pool.query(
       "SELECT id, name, email, password_hash FROM users WHERE LOWER(email) = $1",
       [email]
@@ -234,7 +238,7 @@ router.post("/password/forgot", limiter, async (req, res) => {
   const generic = { sent: true, message: "If an account exists for that email, a reset code has been sent." };
   try {
     const email = String((req.body && req.body.email) || "").trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Please enter a valid email." });
+    if (!isValidEmail(email)) return res.status(400).json({ error: "Please enter a valid email." });
     const result = await pool.query("SELECT id, name, email, password_hash FROM users WHERE LOWER(email) = $1", [email]);
     const user = result.rows[0];
     if (!user || !user.password_hash) return res.json(generic);
@@ -267,7 +271,7 @@ router.post("/password/reset", limiter, async (req, res) => {
   const email = String((req.body && req.body.email) || "").trim().toLowerCase();
   const code = String((req.body && req.body.code) || "").trim();
   const password = String((req.body && req.body.password) || "");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(code)) return res.status(400).json({ error: "Enter your email and the 6-digit reset code." });
+  if (!isValidEmail(email) || !/^\d{6}$/.test(code)) return res.status(400).json({ error: "Enter your email and the 6-digit reset code." });
   if (password.length < 8 || password.length > 72) return res.status(400).json({ error: "Password must be 8 to 72 characters." });
   let client;
   try {
