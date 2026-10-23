@@ -1416,7 +1416,7 @@
       body: JSON.stringify(body),
     }).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) {
-        return { ok: res.ok, data: data };
+        return { ok: res.ok, status: res.status, data: data };
       });
     });
   }
@@ -1425,6 +1425,12 @@
     const p = currentPlan();
     if (!confirmEl.checked) {
       setStatus("Please confirm that you have reviewed the course details.", "is-error");
+      return;
+    }
+    if (!getStudentToken()) {
+      setStatus(IS_LOCAL
+        ? "Please log in before purchasing. For local testing, use the deployed AM Motion Lab site or start the local backend first."
+        : "Please log in to your student account before purchasing, then reopen this course plan.", "is-error");
       return;
     }
     if (!isPaymentConfigured()) {
@@ -1445,14 +1451,29 @@
     postJson(PAYMENT_CONFIG.checkoutEndpoint, { courseId: p.courseId, levelId: p.levelId, student: student })
       .then(function (r) {
         const order = r.data;
-        if (!r.ok || !order || !order.orderId) throw new Error("order");
+        if (!r.ok) {
+          const error = new Error(r.data && r.data.error || "Could not create a secure payment order.");
+          error.status = r.status;
+          throw error;
+        }
+        if (!order || !order.orderId) throw new Error("order");
         if (Number(order.amount) !== p.price * 100 || order.currency !== PAYMENT_CONFIG.currency) throw new Error("amount");
         return loadRazorpayScript().then(function () { return order; });
       })
       .then(function (order) { openRazorpay(order, p, student); })
-      .catch(function () {
+      .catch(function (error) {
         setBusy(false);
-        setStatus("We couldn\u2019t start the payment right now. Nothing has been charged. Please try again, or contact AM Motion Lab to enrol.", "is-error");
+        if (error && error.status === 401) {
+          setStatus("Your student login has expired. Please log in again, then reopen this course plan. Nothing has been charged.", "is-error");
+        } else if (error && error.status === 409) {
+          setStatus(error.message, "is-error");
+        } else if (IS_LOCAL && error instanceof TypeError) {
+          setStatus("The local backend at localhost:3000 is not reachable. Use the deployed AM Motion Lab site or start the local backend. Nothing has been charged.", "is-error");
+        } else if (error && error.message === "script") {
+          setStatus("Razorpay Checkout could not load. Check your connection and try again. Nothing has been charged.", "is-error");
+        } else {
+          setStatus("We couldn\u2019t start the payment right now. Nothing has been charged. Please try again, or contact AM Motion Lab to enrol.", "is-error");
+        }
       });
   }
 
