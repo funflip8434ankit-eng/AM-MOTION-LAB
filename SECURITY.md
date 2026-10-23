@@ -31,5 +31,7 @@ database. Record the last successful backup and restore check before launch.
 - Use Razorpay test mode for checkout verification; never test with a real
   customer's payment details.
 - Set `PUBLIC_SITE_ORIGIN` when the website uses a custom production domain.
+- Review CSP violations when adding a new third-party script, font, frame, or
+  API. Static page CSP allows inline scripts/styles for the current legacy pages.
 - Enable GitHub Dependabot alerts and code scanning in repository settings.
 - Ensure GitHub Pages enforces HTTPS and use HTTPS for all production origins.

@@ -63,9 +63,10 @@ stored in browser storage; prevent XSS and keep the token lifetime limited.
 There are no admin routes or server-side file-upload endpoints today. Add
 separate roles/MFA and upload validation if those features are introduced.
 
-The Express security headers apply to responses served by this backend. The
-GitHub Pages origin needs HTTPS and any response-header policy configured at its
-own host; Express cannot add headers to responses served by GitHub Pages.
+The Express security headers apply to responses served by this backend. Static
+HTML pages also carry a CSP meta policy because GitHub Pages does not inherit
+Express response headers. A meta policy cannot set `frame-ancestors`; the
+backend sends that directive as a response header for pages it serves.
 
 Prices are maintained in `server.js` (authoritative) and `script.js` (display). Change both together.
 
