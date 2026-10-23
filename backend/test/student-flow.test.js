@@ -103,6 +103,13 @@ test("student registration through paid course access and IDOR denial", async (t
   const session = await response.json();
   const headers = { authorization: "Bearer " + session.token, "content-type": "application/json" };
 
+  const staleIssuedAt = Math.floor((Date.now() - 25 * 60 * 60 * 1000) / 1000);
+  const staleToken = jwt.sign({ sub: user.id, iat: staleIssuedAt }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  response = await fetch(base + "/api/learning/courses/video-editing?levelId=basic", {
+    headers: { authorization: "Bearer " + staleToken },
+  });
+  assert.equal(response.status, 401, "tokens older than 24 hours are rejected");
+
   response = await fetch(base + "/api/learning/courses/__proto__/lessons/anything/complete", {
     method: "POST", headers, body: JSON.stringify({ levelId: "constructor" }),
   });

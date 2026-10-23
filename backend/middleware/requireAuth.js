@@ -6,7 +6,8 @@ module.exports = function requireAuth(req, res, next) {
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   if (!token) return res.status(401).json({ error: "Please log in." });
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] });
+    // maxAge also expires older tokens issued before the 24-hour session policy.
+    const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"], maxAge: "24h" });
     req.user = { id: Number(payload.sub) };
     next();
   } catch (e) {
