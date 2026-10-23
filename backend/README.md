@@ -59,7 +59,10 @@ so findings appear in the Security tab.
 
 The API uses bearer JWTs (not cookies), so browser requests do not rely on
 ambient cookie credentials and CSRF tokens are not used. Frontend tokens are
-stored in browser storage; prevent XSS and keep the token lifetime limited.
+stored in tab-scoped `sessionStorage` and expire after 24 hours. Existing
+`localStorage` sessions migrate once and are removed from persistent storage.
+This limits persistence across browser sessions, but active-session tokens
+remain accessible to same-origin scripts, so XSS prevention remains important.
 There are no admin routes or server-side file-upload endpoints today. Add
 separate roles/MFA and upload validation if those features are introduced.
 

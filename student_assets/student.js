@@ -14,9 +14,26 @@
   };
   var LEVELS = { basic: "Basic", advanced: "Advanced", professional: "Professional / Job-Oriented" };
 
-  function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (e) { return ""; } }
-  function setToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} }
-  function clearToken() { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+  function getToken() {
+    try {
+      var token = sessionStorage.getItem(TOKEN_KEY) || "";
+      // Move existing sessions out of persistent storage once, then remove the old copy.
+      if (!token) {
+        token = localStorage.getItem(TOKEN_KEY) || "";
+        if (token) {
+          sessionStorage.setItem(TOKEN_KEY, token);
+          localStorage.removeItem(TOKEN_KEY);
+        }
+      }
+      return token;
+    } catch (e) { return ""; }
+  }
+  function setToken(t) {
+    try { sessionStorage.setItem(TOKEN_KEY, t); localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  }
+  function clearToken() {
+    try { sessionStorage.removeItem(TOKEN_KEY); localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  }
 
   async function api(path, opts) {
     opts = opts || {};

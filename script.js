@@ -842,7 +842,19 @@
        const IS_LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   const API_BASE = IS_LOCAL ? "http://localhost:3000" : "https://am-motion-lab-9ui2.onrender.com";
   function getStudentToken() {
-    try { return localStorage.getItem("amml_token") || ""; } catch (e) { return ""; }
+    try {
+      const key = "amml_token";
+      let token = sessionStorage.getItem(key) || "";
+      // Migrate older persistent sessions to tab-scoped storage once.
+      if (!token) {
+        token = localStorage.getItem(key) || "";
+        if (token) {
+          sessionStorage.setItem(key, token);
+          localStorage.removeItem(key);
+        }
+      }
+      return token;
+    } catch (e) { return ""; }
   }
   const PAYMENT_CONFIG = {
     keyId: "rzp_test_TpItvO0Rb9S0h5",                    // <-- public Key ID (rzp_test_... / rzp_live_...)

@@ -30,7 +30,7 @@ const limiter = rateLimit({
 });
 
 const DUMMY_HASH = bcrypt.hashSync("dummy-password-for-timing", 12);
-const signToken = (userId) => jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "7d" });
+const signToken = (userId) => jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "24h" });
 const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, phone: u.phone });
 const otpHash = (userId, code) => crypto.createHmac("sha256", JWT_SECRET).update(userId + ":" + code).digest("hex");
 
