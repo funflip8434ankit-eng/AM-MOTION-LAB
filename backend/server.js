@@ -195,6 +195,10 @@ app.use(express.static(path.join(__dirname, ".."), { dotfiles: "deny" }));
 pool.query(fs.readFileSync(path.join(__dirname, "course-schema.sql"), "utf8"))
   .then(() => app.listen(PORT, "0.0.0.0", () => console.log("AM Motion Lab listening on port " + PORT)))
   .catch((err) => {
-    console.error("Could not prepare course progress tables:", err && err.message);
+    const errorMessage = err && typeof err.message === "string" && err.message.trim()
+      ? err.message.trim()
+      : String(err || "Unknown database initialization error.");
+    const errorCode = err && err.code ? " (code " + String(err.code) + ")" : "";
+    console.error("Could not prepare course progress tables" + errorCode + ": " + errorMessage);
     process.exit(1);
   });
